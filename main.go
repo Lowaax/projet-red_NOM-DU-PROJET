@@ -1,11 +1,9 @@
 package main
 
-import (
-	"fmt"
-)
+import ()
 
-func main() {
-	fmt.Println("Hello, World!")
+func initCharacter() {
+
 }
 
 func initCharacter() {
