@@ -7,3 +7,7 @@ import (
 func main() {
 	fmt.Println("Hello, World!")
 }
+
+func initCharacter() {
+
+}
