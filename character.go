@@ -1,27 +1,27 @@
 package main
 
 type Race struct {
-	elf         string
-	nain        string
-	orc         string
-	human       string
-	dragon      string
-	mort_vivant string
-	ange        string
-	orque       string
-	centaure    string
-	fée         string
+	Elf         string
+	Nain        string
+	Orc         string
+	Human       string
+	Dragon      string
+	Mort_vivant string
+	Ange        string
+	Orque       string
+	Centaure    string
+	Fée         string
 	Lycanthrope string
-	farfadet    string
-	antromorphe string
+	Farfadet    string
+	Antromorphe string
 }
 
-type classes struct {
-	chevalier    string
-	sorcier      string
-	archer       string
-	assassin     string
-	prêtre       string
-	necromancien string
-	berserker    string
+type Classes struct {
+	Chevalier    string
+	Sorcier      string
+	Archer       string
+	Assassin     string
+	Prêtre       string
+	Necromancien string
+	Berserker    string
 }
