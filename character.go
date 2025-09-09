@@ -25,3 +25,13 @@ type Classes struct {
 	Necromancien string
 	Berserker    string
 }
+
+type Character struct {
+	Name       string
+	Race       Race
+	Niveau     int
+	Pv_max     int
+	Pv_actuel  int
+	Inventaire []string
+	Class      Classes
+}
