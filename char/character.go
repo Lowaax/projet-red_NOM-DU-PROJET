@@ -1,4 +1,4 @@
-package main
+package projet
 
 var Races = []string{
 	"Elf",

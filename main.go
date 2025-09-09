@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	projet "projet_red_NOM-DU-PROJET/char"
 )
 
 func main() {
@@ -15,8 +16,8 @@ func main() {
 	fmt.Println("Inventaire:", c1.Inventory)
 }
 
-func initCharacter(name string, race string, class string, level int, maxHP int, hp int, inventory []string) Character {
-	return Character{
+func initCharacter(name string, race string, class string, level int, maxHP int, hp int, inventory []string) projet.Character {
+	return projet.Character{
 		Name:      name,
 		Race:      race,
 		Class:     class,
