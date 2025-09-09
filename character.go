@@ -1,37 +1,37 @@
 package main
 
-type Race struct {
-	Elf         string
-	Nain        string
-	Orc         string
-	Human       string
-	Dragon      string
-	Mort_vivant string
-	Ange        string
-	Orque       string
-	Centaure    string
-	Fée         string
-	Lycanthrope string
-	Farfadet    string
-	Antromorphe string
+var Races = []string{
+	"Elf",
+	"Nain",
+	"Orc",
+	"Human",
+	"Dragon",
+	"Mort-vivant",
+	"Ange",
+	"Orque",
+	"Centaure",
+	"Fée",
+	"Lycanthrope",
+	"Farfadet",
+	"Antromorphe",
 }
 
-type Classes struct {
-	Chevalier    string
-	Sorcier      string
-	Archer       string
-	Assassin     string
-	Prêtre       string
-	Necromancien string
-	Berserker    string
+var Classes = []string{
+	"Chevalier",
+	"Sorcier",
+	"Archer",
+	"Assassin",
+	"Prêtre",
+	"Necromancien",
+	"Berserker",
 }
 
 type Character struct {
-	Name       string
-	Race       Race
-	Niveau     int
-	Pv_max     int
-	Pv_actuel  int
-	Inventaire []string
-	Class      Classes
+	Name      string
+	Race      string
+	Class     string
+	Level     int
+	MaxHP     int
+	HP        int
+	Inventory []string
 }
