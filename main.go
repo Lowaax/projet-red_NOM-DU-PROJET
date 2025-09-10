@@ -117,7 +117,7 @@ func Shop(c projet.Character) {
 		fmt.Println("Marchand: Une potion de vie ? voila pour toi")
 		c.Inventory = append(c.Inventory, "Potion")
 	} else if choice_shop == 0 {
-		fmt.Println("Marchand: Tu change d'avis ? bah dégage alors")
+		fmt.Println("Marchand: A une prochaine fois peut-être !")
 	} else {
 		fmt.Println("Tu ne peux pas, ", choice_shop, " n'est pas disponible")
 	}
