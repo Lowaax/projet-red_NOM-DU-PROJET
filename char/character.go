@@ -34,4 +34,5 @@ type Character struct {
 	MaxHP     int
 	HP        int
 	Inventory []string
+	Skills    []string
 }
