@@ -122,3 +122,13 @@ func Shop(c projet.Character) {
 		fmt.Println("T'es vraiment con toi, ", choice_shop, "n'est pas une option")
 	}
 }
+
+func IsDead(c projet.Character) bool {
+	if c.HP <= 0 {
+		fmt.Println("Le personnage est mort.")
+		c.HP = c.MaxHP / 2
+		fmt.Println("Le personnage a été ressuscité avec la moitié de ses PV max :", c.HP, "/", c.MaxHP)
+		return true
+	}
+	return false
+}
