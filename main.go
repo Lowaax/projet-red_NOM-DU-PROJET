@@ -6,8 +6,11 @@ import (
 )
 
 func main() {
-	c1 := initCharacter("Aragorn", "Elf", "Chevalier", 10, 100, 80, []string{"Épée", "Bouclier"})
+	c1 := initCharacter("Aragorn", "Elf", "Chevalier", 10, 100, 40, []string{"Épée", "Potion", "Bouclier"})
 
+	displayInfo(c1)
+	accessInventory(c1)
+	takePot(&c1)
 	displayInfo(c1)
 	accessInventory(c1)
 }
@@ -45,4 +48,31 @@ func accessInventory(c projet.Character) {
 		}
 	}
 	fmt.Println("======================")
+}
+
+func takePot(c *projet.Character) {
+	// Chercher une potion dans l'inventaire
+	found := -1
+	for i, item := range c.Inventory {
+		if item == "Potion" {
+			found = i
+			break
+		}
+	}
+
+	if found == -1 {
+		fmt.Println("❌ Vous n'avez pas de potion dans l'inventaire.")
+		return
+	}
+
+	// Retirer la potion de l'inventaire
+	c.Inventory = append(c.Inventory[:found], c.Inventory[found+1:]...)
+
+	// Soigner le personnage
+	c.HP += 50
+	if c.HP > c.MaxHP {
+		c.HP = c.MaxHP
+	}
+
+	fmt.Printf("✅ Vous avez utilisé une potion ! PV : %d/%d\n", c.HP, c.MaxHP)
 }
