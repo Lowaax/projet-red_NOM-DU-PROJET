@@ -79,7 +79,8 @@ func Menu(c projet.Character) {
 		fmt.Println("===== Menu =====")
 		fmt.Println("1. Afficher les informations du personnage")
 		fmt.Println("2. Accéder à l'inventaire")
-		fmt.Println("3. Quitter")
+		fmt.Println("3. Accéder au marchand")
+		fmt.Println("4. Quitter")
 		fmt.Println("================")
 		fmt.Print("Entrez votre choix : ")
 		fmt.Scan(&choix)
@@ -92,6 +93,8 @@ func Menu(c projet.Character) {
 			fmt.Println("- Épée")
 			fmt.Println("- Potion de soin")
 		case 3:
+			c.Shop()
+		case 4:
 			fmt.Println(" Au revoir !")
 			return
 		default:
