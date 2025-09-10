@@ -8,11 +8,12 @@ import (
 func main() {
 	c1 := initCharacter("Aragorn", "Elf", "Chevalier", 10, 100, 40, []string{"Épée", "Potion", "Bouclier"})
 
-	displayInfo(c1)
-	accessInventory(c1)
-	takePot(&c1)
-	displayInfo(c1)
-	accessInventory(c1)
+	//displayInfo(c1)
+	//accessInventory(c1)
+	//takePot(&c1)
+	//displayInfo(c1)
+	//accessInventory(c1)
+	Menu(c1)
 }
 
 func initCharacter(name string, race string, class string, level int, maxHP int, hp int, inventory []string) projet.Character {
@@ -51,7 +52,6 @@ func accessInventory(c projet.Character) {
 }
 
 func takePot(c *projet.Character) {
-	// Chercher une potion dans l'inventaire
 	found := -1
 	for i, item := range c.Inventory {
 		if item == "Potion" {
@@ -64,20 +64,16 @@ func takePot(c *projet.Character) {
 		fmt.Println("❌ Vous n'avez pas de potion dans l'inventaire.")
 		return
 	}
-
-	// Retirer la potion de l'inventaire
 	c.Inventory = append(c.Inventory[:found], c.Inventory[found+1:]...)
-
-	// Soigner le personnage
 	c.HP += 50
+
 	if c.HP > c.MaxHP {
 		c.HP = c.MaxHP
 	}
-
 	fmt.Printf("✅ Vous avez utilisé une potion ! PV : %d/%d\n", c.HP, c.MaxHP)
 }
 
-func Menu() {
+func Menu(c projet.Character) {
 	for {
 		var choix int
 		fmt.Println("===== Menu =====")
@@ -86,12 +82,11 @@ func Menu() {
 		fmt.Println("3. Quitter")
 		fmt.Println("================")
 		fmt.Print("Entrez votre choix : ")
-		fmt.Scanln(&choix)
+		fmt.Scan(&choix)
 
 		switch choix {
 		case 1:
-			fmt.Println(" Informations du personnage :")
-			fmt.Println("Nom: Héros, Niveau: 5, PV: 100/100")
+			displayInfo(c)
 		case 2:
 			fmt.Println(" Inventaire :")
 			fmt.Println("- Épée")
