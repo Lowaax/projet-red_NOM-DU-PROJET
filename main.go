@@ -105,7 +105,7 @@ func Menu(c projet.Character) {
 func Shop(c projet.Character) {
 	var choice_shop int
 	fmt.Println("===== Marchand =====")
-	fmt.Println("Marchand: 'Salut, gros fils de pute, \nqu'est ce qui t'intéresserait dans mon magasin de merde ?'")
+	fmt.Println("Marchand: 'Salut, gros fils de pute, \nqu'est ce qui t'intéresserait dans mon magasin de merde ?")
 	fmt.Println("===== Stock =====")
 	fmt.Println("1: Potion de vie de fdp (Gratuit)")
 	fmt.Println("0: Annuler")
