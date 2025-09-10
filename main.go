@@ -9,6 +9,7 @@ func main() {
 	c1 := initCharacter("Aragorn", "Elf", "Chevalier", 10, 100, 80, []string{"Épée", "Bouclier"})
 
 	displayInfo(c1)
+	accessInventory(c1)
 }
 
 func initCharacter(name string, race string, class string, level int, maxHP int, hp int, inventory []string) projet.Character {
@@ -32,4 +33,16 @@ func displayInfo(c projet.Character) {
 	fmt.Println("PV        :", c.HP, "/", c.MaxHP)
 	fmt.Println("Inventaire:", c.Inventory)
 	fmt.Println("======================================")
+}
+
+func accessInventory(c projet.Character) {
+	fmt.Println("===== Inventaire =====")
+	if len(c.Inventory) == 0 {
+		fmt.Println("L'inventaire est vide.")
+	} else {
+		for i, item := range c.Inventory {
+			fmt.Printf("%d. %s\n", i+1, item)
+		}
+	}
+	fmt.Println("======================")
 }
