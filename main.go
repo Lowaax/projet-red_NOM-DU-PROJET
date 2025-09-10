@@ -6,14 +6,9 @@ import (
 )
 
 func main() {
-	c1 := initCharacter("Aragorn", "Elf", "Chevalier", 10, 100, 100, []string{"Épée", "Bouclier"})
-	fmt.Println("Nom:", c1.Name)
-	fmt.Println("Race:", c1.Race)
-	fmt.Println("Classe:", c1.Class)
-	fmt.Println("Niveau:", c1.Level)
-	fmt.Println("PV Max:", c1.MaxHP)
-	fmt.Println("PV Actuel:", c1.HP)
-	fmt.Println("Inventaire:", c1.Inventory)
+	c1 := initCharacter("Aragorn", "Elf", "Chevalier", 10, 100, 80, []string{"Épée", "Bouclier"})
+
+	displayInfo(c1)
 }
 
 func initCharacter(name string, race string, class string, level int, maxHP int, hp int, inventory []string) projet.Character {
@@ -26,4 +21,15 @@ func initCharacter(name string, race string, class string, level int, maxHP int,
 		HP:        hp,
 		Inventory: inventory,
 	}
+}
+
+func displayInfo(c projet.Character) {
+	fmt.Println("===== Informations du personnage =====")
+	fmt.Println("Nom       :", c.Name)
+	fmt.Println("Race      :", c.Race)
+	fmt.Println("Classe    :", c.Class)
+	fmt.Println("Niveau    :", c.Level)
+	fmt.Println("PV        :", c.HP, "/", c.MaxHP)
+	fmt.Println("Inventaire:", c.Inventory)
+	fmt.Println("======================================")
 }
