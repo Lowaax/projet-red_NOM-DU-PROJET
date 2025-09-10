@@ -78,14 +78,24 @@ func takePot(c *projet.Character) {
 }
 
 func Menu() {
+	var choix int
+
 	fmt.Println("===== Menu =====")
-	switch Menu {
+	fmt.Println("1. Afficher les informations du personnage")
+	fmt.Println("2. Accéder à l'inventaire")
+	fmt.Println("3. Quitter")
+	fmt.Println("================")
+	fmt.Print("Entrez votre choix : ")
+	fmt.Scanln(&choix)
+
+	switch choix {
 	case 1:
 		fmt.Println("1. Afficher les informations du personnage")
 	case 2:
 		fmt.Println("2. Accéder à l'inventaire")
+	case 3:
+		fmt.Println("3. Quitter")
 	default:
-		fmt.Println("4. Quitter")
+		fmt.Println("Choix invalide")
 	}
-	fmt.Println("================")
 }
