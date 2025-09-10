@@ -76,3 +76,16 @@ func takePot(c *projet.Character) {
 
 	fmt.Printf("✅ Vous avez utilisé une potion ! PV : %d/%d\n", c.HP, c.MaxHP)
 }
+
+func Menu() {
+	fmt.Println("===== Menu =====")
+	switch Menu {
+	case 1:
+		fmt.Println("1. Afficher les informations du personnage")
+	case 2:
+		fmt.Println("2. Accéder à l'inventaire")
+	default:
+		fmt.Println("4. Quitter")
+	}
+	fmt.Println("================")
+}
