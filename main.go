@@ -10,7 +10,7 @@ func main() {
 
 	//displayInfo(c1)
 	//accessInventory(c1)
-	//takePot(&c1)
+	//takePot(c1)
 	//displayInfo(c1)
 	//accessInventory(c1)
 	Menu(c1)
@@ -51,7 +51,7 @@ func accessInventory(c projet.Character) {
 	fmt.Println("======================")
 }
 
-func takePot(c *projet.Character) {
+func takePot(c projet.Character) {
 	found := -1
 	for i, item := range c.Inventory {
 		if item == "Potion" {
