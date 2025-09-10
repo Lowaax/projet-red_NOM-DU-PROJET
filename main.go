@@ -39,7 +39,7 @@ func displayInfo(c projet.Character) {
 	fmt.Println("======================================")
 }
 
-func accessInventory(c projet.Character) {
+func AccessInventory(c projet.Character) {
 	fmt.Println("===== Inventaire =====")
 	if len(c.Inventory) == 0 {
 		fmt.Println("L'inventaire est vide.")
@@ -89,11 +89,9 @@ func Menu(c projet.Character) {
 		case 1:
 			displayInfo(c)
 		case 2:
-			fmt.Println(" Inventaire :")
-			fmt.Println("- Épée")
-			fmt.Println("- Potion de soin")
+			AccessInventory(c)
 		case 3:
-			c.Shop()
+			Shop(c)
 		case 4:
 			fmt.Println(" Au revoir !")
 			return
@@ -101,5 +99,26 @@ func Menu(c projet.Character) {
 			fmt.Println("❌ Choix invalide. Veuillez réessayer.")
 		}
 		fmt.Println()
+	}
+}
+
+func Shop(c projet.Character) {
+	var choice_shop int
+	fmt.Println("===== Marchand =====")
+	fmt.Println("Marchand: 'Salut, gros fils de pute, \nqu'est ce qui t'intéresserait dans mon magasin de merde ?'")
+	fmt.Println("===== Stock =====")
+	fmt.Println("1: Potion de vie de fdp (Gratuit)")
+	fmt.Println("0: Annuler")
+	fmt.Println("======================")
+	fmt.Println("Marchand: C'est tout ce que j'ai, sale merde de pigeon")
+	fmt.Println("Vous avez choisi: ")
+	fmt.Scan(&choice_shop)
+	if choice_shop == 1 {
+		fmt.Println("Marchand: Une potion de vie ? voila pour toi")
+		c.Inventory = append(c.Inventory, "Potion")
+	} else if choice_shop == 0 {
+		fmt.Println("Marchand: Tu change d'avis ? bah dégage alors")
+	} else {
+		fmt.Println("T'es vraiment con toi, ", choice_shop, "n'est pas une option")
 	}
 }
