@@ -41,47 +41,38 @@ func displayInfo(c projet.Character) {
 	fmt.Println("======================================")
 }
 
-func AccessInventory(c projet.Character) projet.Character {
+func AccessInventory(c projet.Character) {
 	fmt.Println("===== Inventaire =====")
 	if len(c.Inventory) == 0 {
 		fmt.Println("L'inventaire est vide.")
 		fmt.Println("======================")
-		return c
+		return
 	}
 	for i, item := range c.Inventory {
 		fmt.Printf("%d. %s\n", i+1, item)
 	}
 	fmt.Println("0. Retour")
 	fmt.Println("======================")
-	fmt.Println("Choisissez un item à utiliser : ")
+	fmt.Print("Choisissez un item à utiliser : ")
 
 	var choix int
 	fmt.Scan(&choix)
 
-	if choix == 0 {
-		return c
-	}
-	if choix < 1 || choix > len(c.Inventory) {
-		fmt.Println("❌ Choix invalide.")
-		return c
+	if choix == 0 || choix < 0 || choix > len(c.Inventory) {
+		return
 	}
 
 	item := c.Inventory[choix-1]
 
-	if item == "Livre de Sort : Boule de Feu" {
-		fmt.Println("📖 Vous lisez le grimoire...")
+	switch item {
+	case "Livre de Sort : Boule de Feu":
+		fmt.Println("📖 Vous lisez le grimoire…")
 		spellBook(c)
-		c.Inventory = append(c.Inventory[:choix-1], c.Inventory[choix:]...)
-		return c
-	}
-
-	if item == "Potion" {
+	case "Potion":
 		takePot(c)
-		return c
+	default:
+		fmt.Println("Rien ne se passe…")
 	}
-
-	fmt.Println("Rien ne se passe...")
-	return c
 }
 
 func takePot(c projet.Character) {
@@ -170,14 +161,13 @@ func IsDead(c projet.Character) bool {
 	return false
 }
 
-func spellBook(c projet.Character) projet.Character {
+func spellBook(c projet.Character) {
 	for _, s := range c.Skills {
 		if s == "Boule de Feu" {
 			fmt.Println("✨ Vous connaissez déjà ce sort.")
-			return c
+			return
 		}
 	}
 	c.Skills = append(c.Skills, "Boule de Feu")
 	fmt.Println("🔥 Nouveau sort appris : Boule de Feu !")
-	return c
 }
