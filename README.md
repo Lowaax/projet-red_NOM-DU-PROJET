@@ -42,47 +42,29 @@ Petit RPG en ligne de commande conforme au sujet **Projet RED** : création de p
 
 **Marchand (avec débits d’or)**
 
-Prix :
+ - Prix :
+     - Potion de vie : 3 or
+     - Potion de poison : 6 or
+     - Livre de Sort : Boule de feu : 25 or
+     - Fourrure de Loup : 4 or
+     - Peau de Troll : 7 or
+     - Cuir de Sanglier : 3 or
+     - Plume de Corbeau : 1 or
+     - Augmentation d’inventaire : 30 or
+ - Vérification : or suffisant + place en inventaire.
 
-Potion de vie : 3 or
+**Forgeron (craft & équipements)**
 
-Potion de poison : 6 or
-
-Livre de Sort : Boule de feu : 25 or
-
-Fourrure de Loup : 4 or
-
-Peau de Troll : 7 or
-
-Cuir de Sanglier : 3 or
-
-Plume de Corbeau : 1 or
-
-Augmentation d’inventaire : 30 or
-
-Vérification : or suffisant + place en inventaire.
-
-Forgeron (craft & équipements)
-
-Coût fixe : 5 or par craft, + matériaux requis.
-
-Recettes :
-
-Chapeau de l’aventurier : 1× Plume de Corbeau, 1× Cuir de Sanglier
-
-Tunique de l’aventurier : 2× Fourrure de Loup, 1× Peau de Troll
-
-Bottes de l’aventurier : 1× Fourrure de Loup, 1× Cuir de Sanglier
-
-Équipement & bonus PV max :
-
-Chapeau : +10 PV max
-
-Tunique : +25 PV max
-
-Bottes : +15 PV max
-
-Remplacement : l’ancien équipement retourne dans l’inventaire.
+ - Coût fixe : 5 or par craft, + matériaux requis.
+ - Recettes :
+     - Chapeau de l’aventurier : 1× Plume de Corbeau, 1× Cuir de Sanglier
+     - Tunique de l’aventurier : 2× Fourrure de Loup, 1× Peau de Troll
+     - Bottes de l’aventurier : 1× Fourrure de Loup, 1× Cuir de Sanglier
+ - Équipement & bonus PV max :
+     - Chapeau : +10 PV max
+     - Tunique : +25 PV max
+     - Bottes : +15 PV max
+ - Remplacement : l’ancien équipement retourne dans l’inventaire.
 
 Sorts & Mana
 
