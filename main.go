@@ -66,8 +66,13 @@ func displayInfo(c *projet.Character) {
 	fmt.Println("PV        :", c.HP, "/", c.MaxHP)
 	fmt.Printf("Équipé    : Tête[%s] Torse[%s] Pieds[%s]\n", c.Equip.Head, c.Equip.Chestplate, c.Equip.Feet)
 	fmt.Println("Or        :", c.Gold)
-	fmt.Println("Inventaire:", c.Inventory)
-	fmt.Println("Skills    :", c.Skills)
+	if len(c.Inventory) == 0 {
+		fmt.Println("Inventaire: vide")
+	} else {
+		fmt.Println("Inventaire:", strings.Join(c.Inventory, ", "))
+	}
+
+	fmt.Println("Skills    :", strings.Join(c.Skills, ", "))
 	fmt.Println("======================================")
 }
 
