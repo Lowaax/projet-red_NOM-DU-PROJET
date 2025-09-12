@@ -27,12 +27,14 @@ var Classes = []string{
 }
 
 type Character struct {
-	Name      string
-	Race      string
-	Class     string
-	Level     int
-	MaxHP     int
-	HP        int
-	Inventory []string
-	Skills    []string
+	Name         string
+	Race         string
+	Class        string
+	Level        int
+	MaxHP        int
+	HP           int
+	Inventory    []string
+	Skills       []string
+	Gold         int
+	MaxInventory int
 }
