@@ -173,7 +173,7 @@ func IsDead(c projet.Character) bool {
 func spellBook(c projet.Character) projet.Character {
 	for _, s := range c.Skills {
 		if s == "Boule de Feu" {
-			fmt.Println("✨ Vous connaissez déjà ce sort.")
+			fmt.Println("Vous connaissez déjà ce sort.")
 			return c
 		}
 	}
@@ -181,3 +181,4 @@ func spellBook(c projet.Character) projet.Character {
 	fmt.Println("🔥 Nouveau sort appris : Boule de Feu !")
 	return c
 }
+	
