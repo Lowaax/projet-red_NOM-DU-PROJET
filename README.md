@@ -138,6 +138,6 @@ projet-red_MONJEU/
 
  ## 👤 Auteurs
 
- - Jack ...
- - Eliott ...
+ - Jacques LAFOLIE
+ - Eliott GUERLAIN
  - Florin HAMELIN
