@@ -331,7 +331,6 @@ func Forgeron(c *projet.Character) {
 		}
 
 		c.Gold -= it.Cost
-
 		added := addItem(c, it.Name)
 		if !added {
 			fmt.Println("❌ Impossible d’ajouter l’objet (inventaire plein).")
