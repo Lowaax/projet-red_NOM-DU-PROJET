@@ -226,59 +226,7 @@ func Menu(c *projet.Character) {
 			fmt.Println("Au revoir !")
 			return
 		default:
-<<<<<<< HEAD
-			fmt.Println("❌ Choix invalide. Veuillez réessayer.")
-		}
-		fmt.Println()
-	}
-}
-
-func Shop(c projet.Character) projet.Character {
-	var choice_shop int
-	fmt.Println("===== Marchand =====")
-	fmt.Println("Marchand: Bienvenue jeune aventurier, \nqu'est ce qui t'intéresserait dans ma boutique ?")
-	fmt.Println("===== Stock =====")
-	fmt.Println("1: Potion de vie (Gratuit)")
-	fmt.Println("2: Livre de Sort : Boule de Feu (Gratuit)") // <-- ajout
-	fmt.Println("0: Annuler")
-	fmt.Println("======================")
-	fmt.Println("Marchand: C'est tout ce que j'ai, jeune aventurier")
-	fmt.Print("Vous avez choisi: ")
-	fmt.Scan(&choice_shop)
-
-	if choice_shop == 1 {
-		fmt.Println("Marchand: Une potion de vie ? voila pour toi")
-		c.Inventory = append(c.Inventory, "Potion")
-	} else if choice_shop == 2 {
-		fmt.Println("Marchand: Un grimoire enflammé, prends soin de tes moustaches~")
-		c.Inventory = append(c.Inventory, "Livre de Sort : Boule de Feu")
-	} else if choice_shop == 0 {
-		fmt.Println("Marchand: Tu change d'avis ? A bientôt alors !")
-	} else {
-		fmt.Println("Tu ne peux pas,", choice_shop, "n'est pas disponible")
-	}
-	return c
-}
-
-func IsDead(c projet.Character) bool {
-	if c.HP <= 0 {
-		fmt.Println("Le personnage est mort.")
-		c.HP = c.MaxHP / 2
-		fmt.Println("Le personnage a été ressuscité avec la moitié de ses PV max :", c.HP, "/", c.MaxHP)
-		return true
-	}
-	return false
-}
-
-func spellBook(c projet.Character) projet.Character {
-	for _, s := range c.Skills {
-		if s == "Boule de Feu" {
-			fmt.Println("Vous connaissez déjà ce sort.")
-			return c
-=======
 			fmt.Println("Choix invalide.")
->>>>>>> 76919f7d9b965f4455d1c63a03775b935ad5b8cd
 		}
 	}
 }
-	
