@@ -226,7 +226,6 @@ func Menu(c *projet.Character) {
 			fmt.Println("Au revoir !")
 			return
 		default:
-<<<<<<< HEAD
 			fmt.Println("❌ Choix invalide. Veuillez réessayer.")
 		}
 		fmt.Println()
@@ -275,10 +274,6 @@ func spellBook(c projet.Character) projet.Character {
 		if s == "Boule de Feu" {
 			fmt.Println("Vous connaissez déjà ce sort.")
 			return c
-=======
-			fmt.Println("Choix invalide.")
->>>>>>> 76919f7d9b965f4455d1c63a03775b935ad5b8cd
 		}
 	}
 }
-	
