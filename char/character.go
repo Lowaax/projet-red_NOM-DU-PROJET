@@ -37,4 +37,11 @@ type Character struct {
 	Skills       []string
 	Gold         int
 	MaxInventory int
+	Equip        Equipment
+}
+
+type Equipment struct {
+	Head       string
+	Chestplate string
+	Feet       string
 }

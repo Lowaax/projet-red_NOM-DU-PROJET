@@ -64,7 +64,7 @@ func displayInfo(c *projet.Character) {
 	fmt.Println("Classe    :", c.Class)
 	fmt.Println("Niveau    :", c.Level)
 	fmt.Println("PV        :", c.HP, "/", c.MaxHP)
-	fmt.Println("Équipé    : Tête[%s] Torse[%s] Pieds[%s]\n", c.Equip.Head, c.Equip.Torso, c.Equip.Feet)
+	fmt.Printf("Équipé    : Tête[%s] Torse[%s] Pieds[%s]\n", c.Equip.Head, c.Equip.Chestplate, c.Equip.Feet)
 	fmt.Println("Or        :", c.Gold)
 	fmt.Println("Inventaire:", c.Inventory)
 	fmt.Println("Skills    :", c.Skills)
@@ -327,13 +327,6 @@ func Forgeron(c *projet.Character) {
 }
 
 func Equipement(c *projet.Character) {
-	type Equipment struct {
-		Tête  string
-		Torse string
-		Pieds string
-	}
-	c.Equip = &Equipment{}
-
 	var choix int
 	fmt.Println("===== Équipement =====")
 	fmt.Println("1 : Chapeau de l'aventurier")
@@ -342,11 +335,12 @@ func Equipement(c *projet.Character) {
 	fmt.Println("0 : Retour")
 	fmt.Print("Choix : ")
 	fmt.Scan(&choix)
+
 	switch choix {
 	case 1:
 		for i, item := range c.Inventory {
 			if item == "Chapeau de l'aventurier" {
-				c.Equip.Tête = item
+				c.Equip.Head = item
 				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
 				fmt.Println("Chapeau équipé.")
 				return
@@ -356,17 +350,17 @@ func Equipement(c *projet.Character) {
 	case 2:
 		for i, item := range c.Inventory {
 			if item == "Tunique de l'aventurier" {
-				c.Equip.Torse = item
+				c.Equip.Chestplate = item
 				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
 				fmt.Println("Tunique équipée.")
 				return
 			}
 		}
-		fmt.Println("Ancune tunique trouvée dans l'inventaire.")
+		fmt.Println("Aucune tunique trouvée dans l'inventaire.")
 	case 3:
 		for i, item := range c.Inventory {
 			if item == "Bottes de l'aventurier" {
-				c.Equip.Pieds = item
+				c.Equip.Feet = item
 				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
 				fmt.Println("Bottes équipées.")
 				return
