@@ -390,3 +390,4 @@ func Equipement(c *projet.Character) {
 		fmt.Println("Choix invalide.")
 	}
 }
+
