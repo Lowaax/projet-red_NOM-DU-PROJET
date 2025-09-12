@@ -230,3 +230,97 @@ func Menu(c *projet.Character) {
 		}
 	}
 }
+
+func Forgeron(c *projet.Character) {
+	var choix int
+	fmt.Println("===== Forgeron =====")
+	fmt.Println("1 : Chapeau de l'aventurier")
+	fmt.Println("2 : Tunique de l'aventurier")
+	fmt.Println("3 : Bottes de l'aventurier")
+	fmt.Println("0 : Retour")
+	fmt.Print("Choix : ")
+	fmt.Scan(&choix)
+
+	if choix == 0 {
+		return
+	}
+
+	type Material struct {
+		Name     string
+		Quantity int
+	}
+
+	type Item struct {
+		Name      string
+		Cost      int
+		Materials []Material
+	}
+
+	items := map[int]Item{
+		1: {
+			Name: "Chapeau de l'aventurier",
+			Cost: 5,
+			Materials: []Material{
+				{"Plume de Corbeau", 2},
+				{"Fourrure de Loup", 1},
+			},
+		},
+		2: {
+			Name: "Tunique de l'aventurier",
+			Cost: 5,
+			Materials: []Material{
+				{"Fourrure de Loup", 2},
+				{"Peau de Troll", 1},
+			},
+		},
+		3: {
+			Name: "Bottes de l'aventurier",
+			Cost: 5,
+			Materials: []Material{
+				{"Cuir de Sanglier", 1},
+				{"Fourrure de Loup", 1},
+			},
+		},
+	}
+
+	item, ok := items[choix]
+	if !ok {
+		fmt.Println("Choix invalide.")
+		return
+	}
+
+	canCraft := true
+	for _, mat := range item.Materials {
+		count := 0
+		for _, invItem := range c.Inventory {
+			if invItem == mat.Name {
+				count++
+			}
+		}
+		if count < mat.Quantity {
+			canCraft = false
+			break
+		}
+	}
+
+	if !canCraft {
+		fmt.Println("Matériaux insuffisants.")
+		return
+	}
+
+	if c.Gold < item.Cost {
+		fmt.Println("Pas assez d’or.")
+		return
+	}
+
+	for _, mat := range item.Materials {
+		for i := 0; i < mat.Quantity; i++ {
+			removeItem(c, mat.Name)
+		}
+	}
+
+	c.Gold -= item.Cost
+	addItem(c, item.Name)
+
+	fmt.Printf("%s forgé pour %d or (reste %d).\n", item.Name, item.Cost, c.Gold)
+}
