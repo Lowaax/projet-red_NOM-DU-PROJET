@@ -262,7 +262,7 @@ func Forgeron(c *projet.Character) {
 			Cost: 5,
 			Materials: []Material{
 				{"Plume de Corbeau", 2},
-				{"Fourrure de Loup", 1},
+				{"Cuir de Sanglier", 1},
 			},
 		},
 		2: {
