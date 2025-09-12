@@ -217,7 +217,8 @@ func Menu(c *projet.Character) {
 		fmt.Println("1. Infos personnage")
 		fmt.Println("2. Inventaire")
 		fmt.Println("3. Marchand")
-		fmt.Println("4. Quitter")
+		fmt.Println("4. Forgeron")
+		fmt.Println("5. Quitter")
 		fmt.Print("Choix : ")
 		fmt.Scan(&choix)
 
@@ -229,6 +230,8 @@ func Menu(c *projet.Character) {
 		case 3:
 			Shop(c)
 		case 4:
+			Forgeron(c)
+		case 5:
 			fmt.Println("Au revoir !")
 			return
 		default:
@@ -240,9 +243,9 @@ func Menu(c *projet.Character) {
 func Forgeron(c *projet.Character) {
 	var choix int
 	fmt.Println("===== Forgeron =====")
-	fmt.Println("1 : Chapeau de l'aventurier")
-	fmt.Println("2 : Tunique de l'aventurier")
-	fmt.Println("3 : Bottes de l'aventurier")
+	fmt.Println("1 : Fabriquer Chapeau de l'aventurier (1 Plume de Corbeau + 1 Cuir de Sanglier + 5 or)")
+	fmt.Println("2 : Fabriquer Tunique de l'aventurier (2 Fourrure de Loup + 1 Peau de Troll + 5 or)")
+	fmt.Println("3 : Fabriquer Bottes de l'aventurier (1 Cuir de Sanglier + 1 Fourrure de Loup + 5 or)")
 	fmt.Println("0 : Retour")
 	fmt.Print("Choix : ")
 	fmt.Scan(&choix)
@@ -255,7 +258,6 @@ func Forgeron(c *projet.Character) {
 		Name     string
 		Quantity int
 	}
-
 	type Item struct {
 		Name      string
 		Cost      int
@@ -267,7 +269,7 @@ func Forgeron(c *projet.Character) {
 			Name: "Chapeau de l'aventurier",
 			Cost: 5,
 			Materials: []Material{
-				{"Plume de Corbeau", 2},
+				{"Plume de Corbeau", 1},
 				{"Cuir de Sanglier", 1},
 			},
 		},
@@ -295,40 +297,51 @@ func Forgeron(c *projet.Character) {
 		return
 	}
 
-	canCraft := true
-	for _, mat := range item.Materials {
-		count := 0
-		for _, invItem := range c.Inventory {
-			if invItem == mat.Name {
-				count++
+	var CraftItem = func(it Item) {
+		if c.Gold < it.Cost {
+			fmt.Println("❌ Pas assez d’or.")
+			return
+		}
+		if len(c.Inventory) >= c.MaxInventory {
+			fmt.Println("❌ Inventaire plein, impossible d’ajouter l’équipement.")
+			return
+		}
+
+		missing := false
+		for _, mat := range it.Materials {
+			count := 0
+			for _, invItem := range c.Inventory {
+				if invItem == mat.Name {
+					count++
+				}
+			}
+			if count < mat.Quantity {
+				fmt.Printf("❌ Il manque %d × %s\n", mat.Quantity-count, mat.Name)
+				missing = true
 			}
 		}
-		if count < mat.Quantity {
-			canCraft = false
-			break
+		if missing {
+			return
 		}
-	}
 
-	if !canCraft {
-		fmt.Println("Matériaux insuffisants.")
-		return
-	}
-
-	if c.Gold < item.Cost {
-		fmt.Println("Pas assez d’or.")
-		return
-	}
-
-	for _, mat := range item.Materials {
-		for i := 0; i < mat.Quantity; i++ {
-			removeItem(c, mat.Name)
+		for _, mat := range it.Materials {
+			for i := 0; i < mat.Quantity; i++ {
+				removeItem(c, mat.Name)
+			}
 		}
+
+		c.Gold -= it.Cost
+
+		added := addItem(c, it.Name)
+		if !added {
+			fmt.Println("❌ Impossible d’ajouter l’objet (inventaire plein).")
+			return
+		}
+
+		fmt.Printf("✅ %s forgé pour %d or (reste %d).\n", it.Name, it.Cost, c.Gold)
 	}
 
-	c.Gold -= item.Cost
-	addItem(c, item.Name)
-
-	fmt.Printf("%s forgé pour %d or (reste %d).\n", item.Name, item.Cost, c.Gold)
+	CraftItem(item)
 }
 
 func Equipement(c *projet.Character) {
