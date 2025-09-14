@@ -25,36 +25,45 @@ func initCharacter(name, race, class string, maxHP int) *projet.Character {
 		Level:        1,
 		MaxHP:        maxHP,
 		HP:           maxHP / 2,
-		Inventory:    []string{"Potion", "Potion", "Potion"},
+		Inventory:    map[string]int{"Potion": 3},
 		Skills:       []string{"Coup de poing"},
 		Gold:         100,
 		MaxInventory: 10,
+		Equip:        projet.Equipment{},
 	}
 }
 
 func characterCreation() *projet.Character {
-	var name, class string
+	var name, race string
 	fmt.Print("Choisissez un nom : ")
 	fmt.Scan(&name)
 	name = strings.Title(strings.ToLower(name))
 
-	fmt.Println("Choisissez une classe : (Humain, Elfe, Nain)")
-	fmt.Scan(&class)
+	fmt.Println("Choisissez une race (Humain, Elfe, Nain) :")
+	fmt.Scan(&race)
 
 	var maxHP int
-	switch strings.ToLower(class) {
+	switch strings.ToLower(race) {
 	case "humain":
 		maxHP = 100
+		race = "Humain"
 	case "elfe":
 		maxHP = 80
+		race = "Elfe"
 	case "nain":
 		maxHP = 120
+		race = "Nain"
 	default:
 		maxHP = 100
-		class = "Humain"
+		race = "Humain"
 	}
 
-	return initCharacter(name, "A définir", class, maxHP)
+	fmt.Println("Choisissez une classe : (Chevalier, Sorcier, Archer, Assassin, Prêtre, Necromancien, Berserker)")
+	var class string
+	fmt.Scan(&class)
+	class = strings.Title(strings.ToLower(class))
+
+	return initCharacter(name, race, class, maxHP)
 }
 
 func displayInfo(c *projet.Character) {
@@ -66,24 +75,67 @@ func displayInfo(c *projet.Character) {
 	fmt.Println("PV        :", c.HP, "/", c.MaxHP)
 	fmt.Printf("Équipé    : Tête[%s] Torse[%s] Pieds[%s]\n", c.Equip.Head, c.Equip.Chestplate, c.Equip.Feet)
 	fmt.Println("Or        :", c.Gold)
+
 	if len(c.Inventory) == 0 {
 		fmt.Println("Inventaire: vide")
 	} else {
-		fmt.Println("Inventaire:", strings.Join(c.Inventory, ", "))
+		fmt.Print("Inventaire: ")
+		for item, qty := range c.Inventory {
+			fmt.Printf("%s (x%d), ", item, qty)
+		}
+		fmt.Println()
 	}
 
-	fmt.Println("Skills    :", strings.Join(c.Skills, ", "))
+	if len(c.Skills) == 0 {
+		fmt.Println("Skills    : Aucun")
+	} else {
+		fmt.Println("Skills    :", strings.Join(c.Skills, ", "))
+	}
 	fmt.Println("======================================")
 }
 
+func addItem(c *projet.Character, item string) bool {
+	count := 0
+	for _, qty := range c.Inventory {
+		count += qty
+	}
+	if count >= c.MaxInventory {
+		fmt.Println("❌ Inventaire plein !")
+		return false
+	}
+
+	c.Inventory[item]++
+	return true
+}
+
+func removeItem(c *projet.Character, item string) bool {
+	qty, ok := c.Inventory[item]
+	if !ok || qty <= 0 {
+		return false
+	}
+
+	if qty == 1 {
+		delete(c.Inventory, item)
+	} else {
+		c.Inventory[item]--
+	}
+	return true
+}
+
+// La fonction AccessInventory adaptée à map[string]int
 func AccessInventory(c *projet.Character) {
 	fmt.Println("===== Inventaire =====")
 	if len(c.Inventory) == 0 {
 		fmt.Println("Inventaire vide.")
 		return
 	}
-	for i, item := range c.Inventory {
-		fmt.Printf("%d. %s\n", i+1, item)
+
+	i := 1
+	items := []string{}
+	for item, qty := range c.Inventory {
+		fmt.Printf("%d. %s (x%d)\n", i, item, qty)
+		items = append(items, item)
+		i++
 	}
 	fmt.Println("0. Retour")
 
@@ -91,25 +143,31 @@ func AccessInventory(c *projet.Character) {
 	fmt.Print("Choix : ")
 	fmt.Scan(&choix)
 
-	if choix <= 0 || choix > len(c.Inventory) {
+	if choix == 0 || choix > len(items) {
 		return
 	}
 
-	item := c.Inventory[choix-1]
+	item := items[choix-1]
+
 	switch item {
 	case "Potion":
-		takePot(c)
+		if removeItem(c, "Potion") {
+			takePot(c)
+		}
 	case "Potion de poison":
-		poisonPot(c)
+		if removeItem(c, "Potion de poison") {
+			poisonPot(c)
+		}
 	case "Livre de Sort : Boule de Feu":
-		spellBook(c)
+		if removeItem(c, "Livre de Sort : Boule de Feu") {
+			spellBook(c)
+		}
 	default:
 		fmt.Println("Rien ne se passe…")
 	}
 }
 
 func takePot(c *projet.Character) {
-	removeItem(c, "Potion")
 	c.HP += 50
 	if c.HP > c.MaxHP {
 		c.HP = c.MaxHP
@@ -118,14 +176,17 @@ func takePot(c *projet.Character) {
 }
 
 func poisonPot(c *projet.Character) {
-	removeItem(c, "Potion de poison")
 	for i := 1; i <= 3; i++ {
 		time.Sleep(1 * time.Second)
 		c.HP -= 10
+		if c.HP < 0 {
+			c.HP = 0
+		}
 		fmt.Printf("☠️ Poison tick %d → PV : %d/%d\n", i, c.HP, c.MaxHP)
-	}
-	if c.HP <= 0 {
-		IsDead(c)
+		if c.HP == 0 {
+			IsDead(c)
+			break
+		}
 	}
 }
 
@@ -137,26 +198,7 @@ func spellBook(c *projet.Character) {
 		}
 	}
 	c.Skills = append(c.Skills, "Boule de Feu")
-	removeItem(c, "Livre de Sort : Boule de Feu")
 	fmt.Println("🔥 Nouveau sort appris : Boule de Feu !")
-}
-
-func addItem(c *projet.Character, item string) bool {
-	if len(c.Inventory) >= c.MaxInventory {
-		fmt.Println("❌ Inventaire plein !")
-		return false
-	}
-	c.Inventory = append(c.Inventory, item)
-	return true
-}
-
-func removeItem(c *projet.Character, item string) {
-	for i, it := range c.Inventory {
-		if it == item {
-			c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
-			return
-		}
-	}
 }
 
 func Shop(c *projet.Character) {
@@ -220,7 +262,8 @@ func Menu(c *projet.Character) {
 		fmt.Println("4. Forgeron")
 		fmt.Println("5. Combattre un Gobelin")
 		fmt.Println("6. Combat d'entraînement")
-		fmt.Println("7. Quitter")
+		fmt.Println("7. Équipement")
+		fmt.Println("8. Quitter")
 		fmt.Print("Choix : ")
 		fmt.Scan(&choix)
 
@@ -239,7 +282,10 @@ func Menu(c *projet.Character) {
 		case 6:
 			trainingFight(c)
 		case 7:
+			Equipement(c)
+		case 8:
 			fmt.Println("Au revoir !")
+			return
 		default:
 			fmt.Println("Choix invalide.")
 		}
@@ -303,7 +349,7 @@ func Forgeron(c *projet.Character) {
 		return
 	}
 
-	var CraftItem = func(it Item) {
+	CraftItem := func(it Item) {
 		if c.Gold < it.Cost {
 			fmt.Println("❌ Pas assez d’or.")
 			return
@@ -315,12 +361,7 @@ func Forgeron(c *projet.Character) {
 
 		missing := false
 		for _, mat := range it.Materials {
-			count := 0
-			for _, invItem := range c.Inventory {
-				if invItem == mat.Name {
-					count++
-				}
-			}
+			count := c.Inventory[mat.Name]
 			if count < mat.Quantity {
 				fmt.Printf("❌ Il manque %d × %s\n", mat.Quantity-count, mat.Name)
 				missing = true
@@ -331,18 +372,15 @@ func Forgeron(c *projet.Character) {
 		}
 
 		for _, mat := range it.Materials {
-			for i := 0; i < mat.Quantity; i++ {
-				removeItem(c, mat.Name)
+			c.Inventory[mat.Name] -= mat.Quantity
+			if c.Inventory[mat.Name] <= 0 {
+				delete(c.Inventory, mat.Name)
 			}
 		}
 
 		c.Gold -= it.Cost
-		added := addItem(c, it.Name)
-		if !added {
-			fmt.Println("❌ Impossible d’ajouter l’objet (inventaire plein).")
-			return
-		}
 
+		c.Inventory[it.Name]++
 		fmt.Printf("✅ %s forgé pour %d or (reste %d).\n", it.Name, it.Cost, c.Gold)
 	}
 
@@ -361,35 +399,38 @@ func Equipement(c *projet.Character) {
 
 	switch choix {
 	case 1:
-		for i, item := range c.Inventory {
-			if item == "Chapeau de l'aventurier" {
-				c.Equip.Head = item
-				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
-				fmt.Println("Chapeau équipé.")
-				return
+		if qty, ok := c.Inventory["Chapeau de l'aventurier"]; ok && qty > 0 {
+			c.Equip.Head = "Chapeau de l'aventurier"
+			c.Inventory["Chapeau de l'aventurier"]--
+			if c.Inventory["Chapeau de l'aventurier"] == 0 {
+				delete(c.Inventory, "Chapeau de l'aventurier")
 			}
+			fmt.Println("Chapeau équipé.")
+		} else {
+			fmt.Println("Aucun chapeau trouvé dans l'inventaire.")
 		}
-		fmt.Println("Aucun chapeau trouvé dans l'inventaire.")
 	case 2:
-		for i, item := range c.Inventory {
-			if item == "Tunique de l'aventurier" {
-				c.Equip.Chestplate = item
-				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
-				fmt.Println("Tunique équipée.")
-				return
+		if qty, ok := c.Inventory["Tunique de l'aventurier"]; ok && qty > 0 {
+			c.Equip.Chestplate = "Tunique de l'aventurier"
+			c.Inventory["Tunique de l'aventurier"]--
+			if c.Inventory["Tunique de l'aventurier"] == 0 {
+				delete(c.Inventory, "Tunique de l'aventurier")
 			}
+			fmt.Println("Tunique équipée.")
+		} else {
+			fmt.Println("Aucune tunique trouvée dans l'inventaire.")
 		}
-		fmt.Println("Aucune tunique trouvée dans l'inventaire.")
 	case 3:
-		for i, item := range c.Inventory {
-			if item == "Bottes de l'aventurier" {
-				c.Equip.Feet = item
-				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
-				fmt.Println("Bottes équipées.")
-				return
+		if qty, ok := c.Inventory["Bottes de l'aventurier"]; ok && qty > 0 {
+			c.Equip.Feet = "Bottes de l'aventurier"
+			c.Inventory["Bottes de l'aventurier"]--
+			if c.Inventory["Bottes de l'aventurier"] == 0 {
+				delete(c.Inventory, "Bottes de l'aventurier")
 			}
+			fmt.Println("Bottes équipées.")
+		} else {
+			fmt.Println("Aucune botte trouvée dans l'inventaire.")
 		}
-		fmt.Println("Aucune botte trouvée dans l'inventaire.")
 	case 0:
 		return
 	default:

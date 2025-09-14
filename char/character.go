@@ -1,29 +1,9 @@
 package projet
 
-var Races = []string{
-	"Elf",
-	"Nain",
-	"Orc",
-	"Human",
-	"Dragon",
-	"Mort-vivant",
-	"Ange",
-	"Orque",
-	"Centaure",
-	"Fée",
-	"Lycanthrope",
-	"Farfadet",
-	"Antromorphe",
-}
-
-var Classes = []string{
-	"Chevalier",
-	"Sorcier",
-	"Archer",
-	"Assassin",
-	"Prêtre",
-	"Necromancien",
-	"Berserker",
+type Equipment struct {
+	Head       string
+	Chestplate string
+	Feet       string
 }
 
 type Character struct {
@@ -33,15 +13,25 @@ type Character struct {
 	Level        int
 	MaxHP        int
 	HP           int
-	Inventory    []string
+	Inventory    map[string]int
 	Skills       []string
 	Gold         int
 	MaxInventory int
 	Equip        Equipment
 }
 
-type Equipment struct {
-	Head       string
-	Chestplate string
-	Feet       string
+type Monster struct {
+	Name   string
+	MaxHP  int
+	HP     int
+	Attack int
+}
+
+func InitGoblin() Monster {
+	return Monster{
+		Name:   "Gobelin d'entraînement",
+		MaxHP:  40,
+		HP:     40,
+		Attack: 5,
+	}
 }
