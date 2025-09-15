@@ -19,16 +19,18 @@ func main() {
 
 func initCharacter(name, race, class string, maxHP int) *projet.Character {
 	return &projet.Character{
-		Name:         name,
-		Race:         race,
-		Class:        class,
-		Level:        1,
-		MaxHP:        maxHP,
-		HP:           maxHP / 2,
-		Inventory:    []string{"Potion", "Potion", "Potion"},
-		Skills:       []string{"Coup de poing"},
-		Gold:         100,
-		MaxInventory: 10,
+		Name:              name,
+		Race:              race,
+		Class:             class,
+		Level:             1,
+		BaseMaxHP:         maxHP,
+		MaxHP:             maxHP,
+		HP:                maxHP / 2,
+		Inventory:         []string{"Potion", "Potion", "Potion"},
+		Skills:            []string{"Coup de poing"},
+		Gold:              100,
+		MaxInventory:      10,
+		InventoryUpgrades: 0,
 	}
 }
 
@@ -169,6 +171,7 @@ func Shop(c *projet.Character) {
 	fmt.Println("5: Peau de Troll (7 or)")
 	fmt.Println("6: Cuir de Sanglier (3 or)")
 	fmt.Println("7: Plume de Corbeau (1 or)")
+	fmt.Println("8: Augmentation d'inventaire (+10 slots, 30 or)  — max 3")
 	fmt.Println("0: Retour")
 	fmt.Print("Choix : ")
 	fmt.Scan(&choix)
@@ -197,6 +200,28 @@ func Shop(c *projet.Character) {
 			c.Gold -= offer.Cost
 			fmt.Printf("✅ %s acheté pour %d or (reste %d).\n", offer.Name, offer.Cost, c.Gold)
 		}
+		return
+	}
+
+	if choix == 8 {
+		if c.InventoryUpgrades >= 3 {
+			fmt.Println("❌ Limite atteinte : vous avez déjà utilisé 3 augmentations.")
+			return
+		}
+		if c.Gold < 30 {
+			fmt.Println("❌ Pas assez d’or.")
+			return
+		}
+		c.Gold -= 30
+		c.MaxInventory += 10
+		c.InventoryUpgrades++
+		fmt.Printf("✅ Capacité d’inventaire augmentée à %d (utilisations : %d/3). Or restant : %d.\n",
+			c.MaxInventory, c.InventoryUpgrades, c.Gold)
+		return
+	}
+
+	if choix != 0 {
+		fmt.Println("Choix invalide.")
 	}
 }
 
@@ -344,6 +369,30 @@ func Forgeron(c *projet.Character) {
 	CraftItem(item)
 }
 
+func equipBonus(item string) int {
+	switch item {
+	case "Chapeau de l'aventurier":
+		return 10
+	case "Tunique de l'aventurier":
+		return 25
+	case "Bottes de l'aventurier":
+		return 15
+	default:
+		return 0
+	}
+}
+
+func recomputeMaxHP(c *projet.Character) {
+	base := c.BaseMaxHP
+	base += equipBonus(c.Equip.Head)
+	base += equipBonus(c.Equip.Chestplate)
+	base += equipBonus(c.Equip.Feet)
+	c.MaxHP = base
+	if c.HP > c.MaxHP {
+		c.HP = c.MaxHP
+	}
+}
+
 func Equipement(c *projet.Character) {
 	var choix int
 	fmt.Println("===== Équipement =====")
@@ -354,37 +403,57 @@ func Equipement(c *projet.Character) {
 	fmt.Print("Choix : ")
 	fmt.Scan(&choix)
 
+	pickFromInv := func(needle string) (int, bool) {
+		for i, item := range c.Inventory {
+			if item == needle {
+				return i, true
+			}
+		}
+		return -1, false
+	}
+
 	switch choix {
 	case 1:
-		for i, item := range c.Inventory {
-			if item == "Chapeau de l'aventurier" {
-				c.Equip.Head = item
-				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
-				fmt.Println("Chapeau équipé.")
-				return
-			}
+		idx, ok := pickFromInv("Chapeau de l'aventurier")
+		if !ok {
+			fmt.Println("Aucun chapeau trouvé dans l'inventaire.")
+			return
 		}
-		fmt.Println("Aucun chapeau trouvé dans l'inventaire.")
+
+		if c.Equip.Head != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Head)
+		}
+
+		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
+		c.Equip.Head = "Chapeau de l'aventurier"
+		recomputeMaxHP(c)
+		fmt.Println("Chapeau équipé.")
 	case 2:
-		for i, item := range c.Inventory {
-			if item == "Tunique de l'aventurier" {
-				c.Equip.Chestplate = item
-				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
-				fmt.Println("Tunique équipée.")
-				return
-			}
+		idx, ok := pickFromInv("Tunique de l'aventurier")
+		if !ok {
+			fmt.Println("Aucune tunique trouvée dans l'inventaire.")
+			return
 		}
-		fmt.Println("Aucune tunique trouvée dans l'inventaire.")
+		if c.Equip.Chestplate != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Chestplate)
+		}
+		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
+		c.Equip.Chestplate = "Tunique de l'aventurier"
+		recomputeMaxHP(c)
+		fmt.Println("Tunique équipée.")
 	case 3:
-		for i, item := range c.Inventory {
-			if item == "Bottes de l'aventurier" {
-				c.Equip.Feet = item
-				c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
-				fmt.Println("Bottes équipées.")
-				return
-			}
+		idx, ok := pickFromInv("Bottes de l'aventurier")
+		if !ok {
+			fmt.Println("Aucune botte trouvée dans l'inventaire.")
+			return
 		}
-		fmt.Println("Aucune botte trouvée dans l'inventaire.")
+		if c.Equip.Feet != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Feet)
+		}
+		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
+		c.Equip.Feet = "Bottes de l'aventurier"
+		recomputeMaxHP(c)
+		fmt.Println("Bottes équipées.")
 	case 0:
 		return
 	default:
