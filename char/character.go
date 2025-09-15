@@ -46,32 +46,34 @@ type Character struct {
 	Skills            []string
 
 	Equip struct {
-		Head       string
-		Chestplate string
-		Feet       string
-		Weapon     string
+		Tête       string
+		Torse string
+		Pieds       string
+		Arme     string
 	}
 }
 type Equipment struct {
-	Head       string
-	Chestplate string
-	Feet       string
-	Weapon     string
-	Shield     string
-	Accessory  string
+	Tête       string
+	Torse string
+	Gants      string
+	Ceinture	string 
+	Pieds       string
+	Arme     string
+	Bouclier     string
+	Talisman  string
 }
 
-type WeaponStats struct {
+type ArmeStats struct {
 	Min int
 	Max int
 }
 
-type ArmorStats struct {
-	Slot    string // "Head", "Chestplate", "Feet"
+type ArmureStats struct {
+	Slot    string // "Tête", "Torse", "Pieds"
 	HPBonus int
 }
 
-var WeaponsDB = map[string]struct{ Min, Max int }{
+var ArmeDB = map[string]struct{ Min, Max int }{
 	"Coup de poing":  {Min: 3, Max: 5},
 	"Épée courte":    {Min: 5, Max: 8},
 	"Bâton usé":      {Min: 4, Max: 7},
@@ -82,20 +84,18 @@ var WeaponsDB = map[string]struct{ Min, Max int }{
 	"Hache rouillée": {Min: 6, Max: 9},
 }
 
-var ArmorsDB = map[string]struct {
-	Slot    string // "Head" | "Chestplate" | "Feet"
+var ArmureDB = map[string]struct {
+	Slot    string // "Tête" | "Torse" | "Pieds"
 	HPBonus int
 }{
-	"Chapeau de l'aventurier": {Slot: "Head", HPBonus: 10},
-	"Tunique de l'aventurier": {Slot: "Chestplate", HPBonus: 25},
-	"Bottes de l'aventurier":  {Slot: "Feet", HPBonus: 15},
-
-	// Stuff de départ (petits bonus)
-	"Armure rembourrée": {Slot: "Chestplate", HPBonus: 15},
-	"Robe simple":       {Slot: "Chestplate", HPBonus: 10},
-	"Tunique légère":    {Slot: "Chestplate", HPBonus: 8},
-	"Cape sombre":       {Slot: "Chestplate", HPBonus: 5},
-	"Robe bénie":        {Slot: "Chestplate", HPBonus: 12},
-	"Robe noire":        {Slot: "Chestplate", HPBonus: 10},
-	"Bottes souples":    {Slot: "Feet", HPBonus: 5},
+	"Chapeau de l'aventurier": {Slot: "Tête", HPBonus: 10},
+	"Tunique de l'aventurier": {Slot: "Torse", HPBonus: 25},
+	"Bottes de l'aventurier":  {Slot: "Pieds", HPBonus: 15},
+	"Armure rembourrée": {Slot: "Torse", HPBonus: 15},
+	"Robe simple":       {Slot: "Torse", HPBonus: 10},
+	"Tunique légère":    {Slot: "Torse", HPBonus: 8},
+	"Cape sombre":       {Slot: "Torse", HPBonus: 5},
+	"Robe bénie":        {Slot: "Torse", HPBonus: 12},
+	"Robe noire":        {Slot: "Torse", HPBonus: 10},
+	"Bottes souples":    {Slot: "Pieds", HPBonus: 5},
 }

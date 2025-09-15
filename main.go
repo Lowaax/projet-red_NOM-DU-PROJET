@@ -138,38 +138,38 @@ func characterCreation() *projet.Character {
 	switch class {
 	case "Chevalier":
 		c.Inventory = append(c.Inventory, "Épée courte", "Bouclier en bois", "Armure rembourrée")
-		c.Equip.Weapon = "Épée courte"
-		c.Equip.Chestplate = "Armure rembourrée"
+		c.Equip.Arme = "Épée courte"
+		c.Equip.Torse = "Armure rembourrée"
 
 	case "Sorcier":
 		c.Inventory = append(c.Inventory, "Bâton usé", "Robe simple", "Grimoire débutant")
-		c.Equip.Weapon = "Bâton usé"
-		c.Equip.Chestplate = "Robe simple"
+		c.Equip.Arme = "Bâton usé"
+		c.Equip.Torse = "Robe simple"
 
 	case "Archer":
 		c.Inventory = append(c.Inventory, "Arc court", "Carquois (x20)", "Tunique légère")
-		c.Equip.Weapon = "Arc court"
-		c.Equip.Chestplate = "Tunique légère"
+		c.Equip.Arme = "Arc court"
+		c.Equip.Torse = "Tunique légère"
 
 	case "Assassin":
 		c.Inventory = append(c.Inventory, "Dague", "Cape sombre", "Bottes souples")
-		c.Equip.Weapon = "Dague"
-		c.Equip.Chestplate = "Cape sombre"
-		c.Equip.Feet = "Bottes souples"
+		c.Equip.Arme = "Dague"
+		c.Equip.Torse = "Cape sombre"
+		c.Equip.Pieds = "Bottes souples"
 
 	case "Prêtre":
 		c.Inventory = append(c.Inventory, "Masse légère", "Robe bénie", "Amulette")
-		c.Equip.Weapon = "Masse légère"
-		c.Equip.Chestplate = "Robe bénie"
+		c.Equip.Arme = "Masse légère"
+		c.Equip.Torse = "Robe bénie"
 
 	case "Necromancien":
 		c.Inventory = append(c.Inventory, "Bâton d’os", "Robe noire", "Talisman occulte")
-		c.Equip.Weapon = "Bâton d’os"
-		c.Equip.Chestplate = "Robe noire"
+		c.Equip.Arme = "Bâton d’os"
+		c.Equip.Torse = "Robe noire"
 
 	case "Berserker":
 		c.Inventory = append(c.Inventory, "Hache rouillée", "Bandeau", "Ceinture de cuir")
-		c.Equip.Weapon = "Hache rouillée"
+		c.Equip.Arme = "Hache rouillée"
 	}
 
 	recomputeMaxHP(c)
@@ -186,14 +186,14 @@ func displayInfo(c *projet.Character) {
 	fmt.Printf("Mana      : %d / %d\n", c.Mana, c.MaxMana)
 	fmt.Printf("Initiative: %d\n", c.Initiative)
 	fmt.Printf("XP        : %d / %d\n", c.Exp, c.ExpMax)
-	fmt.Printf("Équipé    : Arme[%s] Tête[%s] Torse[%s] Pieds[%s]\n",
+	fmt.Printf("Équipé    : Arme[%s] Tête[%s] Torse[%s] Gant[%s] Centure[%s] Pieds[%s] Talisman[%s]\n",
 		func() string {
-			if c.Equip.Weapon == "" {
+			if c.Equip.Arme == "" {
 				return "Coup de poing"
 			}
-			return c.Equip.Weapon
+			return c.Equip.Arme
 		}(),
-		c.Equip.Head, c.Equip.Chestplate, c.Equip.Feet)
+		c.Equip.Tête, c.Equip.Torse, c.Equip.Pieds, c.Equip.Gants, c.Equip.Ceinture, c.Equip.Talisman)
 	fmt.Println("Or        :", c.Gold)
 	if len(c.Inventory) == 0 {
 		fmt.Println("Inventaire: vide")
@@ -235,11 +235,11 @@ func AccessInventory(c *projet.Character) {
 		manaPot(c)
 
 	default:
-		if _, ok := projet.WeaponsDB[item]; ok && item != "Coup de poing" {
+		if _, ok := projet.ArmeDB[item]; ok && item != "Coup de poing" {
 			equipWeapon(c, item)
 			return
 		}
-		if _, ok := projet.ArmorsDB[item]; ok {
+		if _, ok := projet.ArmureDB[item]; ok {
 			equipArmor(c, item)
 			return
 		}
@@ -524,13 +524,13 @@ func Forgeron(c *projet.Character) {
 
 func recomputeMaxHP(c *projet.Character) {
 	base := c.BaseMaxHP
-	if a, ok := projet.ArmorsDB[c.Equip.Head]; ok {
+	if a, ok := projet.ArmureDB[c.Equip.Tête]; ok {
 		base += a.HPBonus
 	}
-	if a, ok := projet.ArmorsDB[c.Equip.Chestplate]; ok {
+	if a, ok := projet.ArmureDB[c.Equip.Torse]; ok {
 		base += a.HPBonus
 	}
-	if a, ok := projet.ArmorsDB[c.Equip.Feet]; ok {
+	if a, ok := projet.ArmureDB[c.Equip.Pieds]; ok {
 		base += a.HPBonus
 	}
 	c.MaxHP = base
@@ -566,12 +566,12 @@ func Equipement(c *projet.Character) {
 			return
 		}
 
-		if c.Equip.Head != "" {
-			c.Inventory = append(c.Inventory, c.Equip.Head)
+		if c.Equip.Tête != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Tête)
 		}
 
 		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
-		c.Equip.Head = "Chapeau de l'aventurier"
+		c.Equip.Tête = "Chapeau de l'aventurier"
 		recomputeMaxHP(c)
 		fmt.Println("Chapeau équipé.")
 	case 2:
@@ -580,11 +580,11 @@ func Equipement(c *projet.Character) {
 			fmt.Println("Aucune tunique trouvée dans l'inventaire.")
 			return
 		}
-		if c.Equip.Chestplate != "" {
-			c.Inventory = append(c.Inventory, c.Equip.Chestplate)
+		if c.Equip.Torse != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Torse)
 		}
 		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
-		c.Equip.Chestplate = "Tunique de l'aventurier"
+		c.Equip.Torse = "Tunique de l'aventurier"
 		recomputeMaxHP(c)
 		fmt.Println("Tunique équipée.")
 	case 3:
@@ -593,11 +593,11 @@ func Equipement(c *projet.Character) {
 			fmt.Println("Aucune botte trouvée dans l'inventaire.")
 			return
 		}
-		if c.Equip.Feet != "" {
-			c.Inventory = append(c.Inventory, c.Equip.Feet)
+		if c.Equip.Pieds != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Pieds)
 		}
 		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
-		c.Equip.Feet = "Bottes de l'aventurier"
+		c.Equip.Pieds = "Bottes de l'aventurier"
 		recomputeMaxHP(c)
 		fmt.Println("Bottes équipées.")
 	case 0:
@@ -651,8 +651,8 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 		switch choix {
 		case 1:
 			weapons := []string{"Coup de poing"}
-			if c.Equip.Weapon != "" {
-				weapons = append(weapons, c.Equip.Weapon)
+			if c.Equip.Arme != "" {
+				weapons = append(weapons, c.Equip.Arme)
 			}
 
 			fmt.Println("— Choisir l’arme —")
@@ -809,11 +809,11 @@ func initTrainingGoblin() *Monster {
 }
 
 func weaponDamageRange(weaponName string) (min, max int) {
-	if ws, ok := projet.WeaponsDB[weaponName]; ok {
+	if ws, ok := projet.ArmeDB[weaponName]; ok {
 		return ws.Min, ws.Max
 	}
 	// fallback
-	return projet.WeaponsDB["Coup de poing"].Min, projet.WeaponsDB["Coup de poing"].Max
+	return projet.ArmeDB["Coup de poing"].Min, projet.ArmeDB["Coup de poing"].Max
 }
 
 func rollDamage(min, max int) int {
@@ -824,46 +824,41 @@ func rollDamage(min, max int) int {
 }
 
 func equipWeapon(c *projet.Character, name string) {
-	if _, ok := projet.WeaponsDB[name]; !ok {
+	if _, ok := projet.ArmeDB[name]; !ok {
 		fmt.Println("Ce n’est pas une arme équipable.")
 		return
 	}
-	// remet l’ancienne arme dans l’inventaire
-	if c.Equip.Weapon != "" {
-		c.Inventory = append(c.Inventory, c.Equip.Weapon)
+	if c.Equip.Arme != "" {
+		c.Inventory = append(c.Inventory, c.Equip.Arme)
 	}
-	// équipe la nouvelle
 	removeItem(c, name)
-	c.Equip.Weapon = name
+	c.Equip.Arme = name
 	fmt.Printf("🔪 Arme équipée : %s\n", name)
 }
 
 func equipArmor(c *projet.Character, name string) {
-	a, ok := projet.ArmorsDB[name]
+	a, ok := projet.ArmureDB[name]
 	if !ok {
 		fmt.Println("Ce n’est pas une armure connue.")
 		return
 	}
-	// retire de l’inventaire
 	removeItem(c, name)
-
-	// remet l’ancien item du slot dans l’inventaire
 	switch a.Slot {
 	case "Head":
-		if c.Equip.Head != "" {
-			c.Inventory = append(c.Inventory, c.Equip.Head)
+		if c.Equip.Tête != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Tête)
 		}
-		c.Equip.Head = name
+		c.Equip.Tête = name
 	case "Chestplate":
-		if c.Equip.Chestplate != "" {
-			c.Inventory = append(c.Inventory, c.Equip.Chestplate)
+		if c.Equip.Torse != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Torse)
 		}
-		c.Equip.Chestplate = name
+		c.Equip.Torse = name
 	case "Feet":
-		if c.Equip.Feet != "" {
-			c.Inventory = append(c.Inventory, c.Equip.Feet)
+		if c.Equip.Pieds != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Pieds)
 		}
-		c.Equip.Feet = name
+		c.Equip.Pieds = name
 	}
 
 	recomputeMaxHP(c)
