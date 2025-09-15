@@ -439,7 +439,7 @@ func Equipement(c *projet.Character) {
 	}
 }
 
-func goblinPattern(c *projet.Character) {
+func GoblinPattern(c *projet.Character) {
 	goblin := projet.InitGoblin()
 	tour := 1
 
@@ -488,7 +488,7 @@ func characterTurn(player *projet.Character, monster *projet.Monster) bool {
 			degats := 5
 
 			if rand.Float64() < 0.05 {
-				degats *= 2.5
+				degats *= 2
 				attaque = "Attaque critique"
 			}
 
@@ -618,7 +618,7 @@ func monsterTurn(player *projet.Character, monster *projet.Monster) {
 func fightGoblin(player *projet.Character) {
 	goblin := projet.InitGoblin()
 
-	fmt.Println("Un Gobelin d'entraînement apparaît!")
+	fmt.Println("Un Gobelin apparaît!")
 
 	for goblin.HP > 0 && player.HP > 0 {
 		victoire := characterTurn(player, &goblin)
@@ -635,6 +635,7 @@ func trainingFight(player *projet.Character) {
 	goblin := projet.InitGoblin()
 	tour := 1
 
+	fmt.Println("Un Gobelin d'entraînement apparaît!")
 	fmt.Println("Début du combat")
 
 	for goblin.HP > 0 && player.HP > 0 {
