@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand/v2"
 	projet "projet_red_NOM-DU-PROJET/char"
 	"strings"
 	"time"
@@ -485,6 +486,12 @@ func characterTurn(player *projet.Character, monster *projet.Monster) bool {
 		case 1:
 			attaque := "Attaque basique"
 			degats := 5
+
+			if rand.Float64() < 0.05 {
+				degats *= 2.5
+				attaque = "Attaque critique"
+			}
+
 			monster.HP -= degats
 			if monster.HP < 0 {
 				monster.HP = 0
