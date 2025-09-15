@@ -50,6 +50,9 @@ type Character struct {
 		Torse string
 		Pieds       string
 		Arme     string
+		Talisman  string
+		Gants      string
+		Ceinture	string 
 	}
 }
 type Equipment struct {
@@ -59,7 +62,6 @@ type Equipment struct {
 	Ceinture	string 
 	Pieds       string
 	Arme     string
-	Bouclier     string
 	Talisman  string
 }
 

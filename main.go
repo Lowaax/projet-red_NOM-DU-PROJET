@@ -137,7 +137,7 @@ func characterCreation() *projet.Character {
 
 	switch class {
 	case "Chevalier":
-		c.Inventory = append(c.Inventory, "Épée courte", "Bouclier en bois", "Armure rembourrée")
+		c.Inventory = append(c.Inventory, "Épée courte", "Armure rembourrée")
 		c.Equip.Arme = "Épée courte"
 		c.Equip.Torse = "Armure rembourrée"
 
@@ -158,18 +158,22 @@ func characterCreation() *projet.Character {
 		c.Equip.Pieds = "Bottes souples"
 
 	case "Prêtre":
-		c.Inventory = append(c.Inventory, "Masse légère", "Robe bénie", "Amulette")
+		c.Inventory = append(c.Inventory, "Masse légère", "Robe bénie", "Amulette de protection")
 		c.Equip.Arme = "Masse légère"
 		c.Equip.Torse = "Robe bénie"
+		c.Equip.Talisman = "Amulette de protection"
 
 	case "Necromancien":
 		c.Inventory = append(c.Inventory, "Bâton d’os", "Robe noire", "Talisman occulte")
 		c.Equip.Arme = "Bâton d’os"
 		c.Equip.Torse = "Robe noire"
+		c.Equip.Talisman = "Talisman occulte"
 
 	case "Berserker":
 		c.Inventory = append(c.Inventory, "Hache rouillée", "Bandeau", "Ceinture de cuir")
 		c.Equip.Arme = "Hache rouillée"
+		c.Equip.Tête = "Bandeau"
+		c.Equip.Ceinture = "Ceinture de cuir"
 	}
 
 	recomputeMaxHP(c)
