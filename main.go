@@ -570,13 +570,15 @@ func goblinPattern(g *Monster, c *projet.Character, turn int) {
 	dmg := g.ATK
 	if turn%3 == 0 {
 		dmg = g.ATK * 2
+		fmt.Printf("%s déclenche une attaque renforcée ! %s subit %d dégâts.\n", g.Name, c.Name, dmg)
+	} else {
+		fmt.Printf("%s attaque et inflige %d dégâts à %s.\n", g.Name, dmg, c.Name)
 	}
 	c.HP -= dmg
 	if c.HP < 0 {
 		c.HP = 0
 	}
-	fmt.Printf("%s inflige à %s %d dégâts\n", g.Name, c.Name, dmg)
-	fmt.Printf("%s PV : %d / %d\n", c.Name, c.HP, c.MaxHP)
+	fmt.Printf("PV de %s : %d / %d\n", c.Name, c.HP, c.MaxHP)
 
 	if c.HP <= 0 {
 		_ = IsDead(c)
@@ -600,8 +602,8 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 			if g.HP < 0 {
 				g.HP = 0
 			}
-			fmt.Printf("%s utilise Attaque basique et inflige %d dégâts à %s\n", c.Name, dmg, g.Name)
-			fmt.Printf("%s PV : %d / %d\n", g.Name, g.HP, g.MaxHP)
+			fmt.Printf("%s attaque et inflige %d dégâts à %s.\n", c.Name, dmg, g.Name)
+			fmt.Printf("PV de %s : %d / %d\n", g.Name, g.HP, g.MaxHP)
 			return false
 		case 2:
 			AccessInventory(c)
