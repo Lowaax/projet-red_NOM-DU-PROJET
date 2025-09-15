@@ -674,7 +674,3 @@ func trainingFight(player *projet.Character) {
 
 	fmt.Println("Fin du combat")
 }
-=======
->>>>>>> parent of 11df4d9 (Update main.go)
-=======
->>>>>>> parent of 11df4d9 (Update main.go)
