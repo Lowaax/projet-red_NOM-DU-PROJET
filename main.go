@@ -276,9 +276,9 @@ func Menu(c *projet.Character) {
 			Shop(c)
 		case 4:
 			Forgeron(c)
-		case 7:
+		case 5:
 			Equipement(c)
-		case 8:
+		case 6:
 			fmt.Println("Au revoir !")
 			return
 		default:
