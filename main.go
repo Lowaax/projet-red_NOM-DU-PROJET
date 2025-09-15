@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	projet "projet_red_NOM-DU-PROJET/char"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 
 func main() {
 	c1 := characterCreation()
+	rand.Seed(time.Now().UnixNano())
 	Menu(c1)
 	//displayInfo(c1)
 	//accessInventory(c1)
@@ -128,24 +130,44 @@ func characterCreation() *projet.Character {
 	// Création du perso avec PV selon la race (HP init = 50% dans initCharacter)
 	c := initCharacter(name, race, class, maxHP)
 
-	// --- STUFF DE BASE PAR CLASSE (simple et direct) ---
 	switch class {
 	case "Chevalier":
 		c.Inventory = append(c.Inventory, "Épée courte", "Bouclier en bois", "Armure rembourrée")
+		c.Equip.Weapon = "Épée courte"
+		c.Equip.Chestplate = "Armure rembourrée"
+
 	case "Sorcier":
 		c.Inventory = append(c.Inventory, "Bâton usé", "Robe simple", "Grimoire débutant")
+		c.Equip.Weapon = "Bâton usé"
+		c.Equip.Chestplate = "Robe simple"
+
 	case "Archer":
 		c.Inventory = append(c.Inventory, "Arc court", "Carquois (x20)", "Tunique légère")
+		c.Equip.Weapon = "Arc court"
+		c.Equip.Chestplate = "Tunique légère"
+
 	case "Assassin":
 		c.Inventory = append(c.Inventory, "Dague", "Cape sombre", "Bottes souples")
+		c.Equip.Weapon = "Dague"
+		c.Equip.Chestplate = "Cape sombre"
+		c.Equip.Feet = "Bottes souples"
+
 	case "Prêtre":
 		c.Inventory = append(c.Inventory, "Masse légère", "Robe bénie", "Amulette")
+		c.Equip.Weapon = "Masse légère"
+		c.Equip.Chestplate = "Robe bénie"
+
 	case "Necromancien":
 		c.Inventory = append(c.Inventory, "Bâton d’os", "Robe noire", "Talisman occulte")
+		c.Equip.Weapon = "Bâton d’os"
+		c.Equip.Chestplate = "Robe noire"
+
 	case "Berserker":
 		c.Inventory = append(c.Inventory, "Hache rouillée", "Bandeau", "Ceinture de cuir")
+		c.Equip.Weapon = "Hache rouillée"
 	}
 
+	recomputeMaxHP(c)
 	return c
 }
 
@@ -156,14 +178,20 @@ func displayInfo(c *projet.Character) {
 	fmt.Println("Classe    :", c.Class)
 	fmt.Println("Niveau    :", c.Level)
 	fmt.Println("PV        :", c.HP, "/", c.MaxHP)
-	fmt.Printf("Équipé    : Tête[%s] Torse[%s] Pieds[%s]\n", c.Equip.Head, c.Equip.Chestplate, c.Equip.Feet)
+	fmt.Printf("Équipé    : Arme[%s] Tête[%s] Torse[%s] Pieds[%s]\n",
+		func() string {
+			if c.Equip.Weapon == "" {
+				return "Coup de poing"
+			}
+			return c.Equip.Weapon
+		}(),
+		c.Equip.Head, c.Equip.Chestplate, c.Equip.Feet)
 	fmt.Println("Or        :", c.Gold)
 	if len(c.Inventory) == 0 {
 		fmt.Println("Inventaire: vide")
 	} else {
 		fmt.Println("Inventaire:", strings.Join(c.Inventory, ", "))
 	}
-
 	fmt.Println("Skills    :", strings.Join(c.Skills, ", "))
 	fmt.Println("======================================")
 }
@@ -195,7 +223,16 @@ func AccessInventory(c *projet.Character) {
 		poisonPot(c)
 	case "Livre de Sort : Boule de Feu":
 		spellBook(c)
+
 	default:
+		if _, ok := projet.WeaponsDB[item]; ok && item != "Coup de poing" {
+			equipWeapon(c, item)
+			return
+		}
+		if _, ok := projet.ArmorsDB[item]; ok {
+			equipArmor(c, item)
+			return
+		}
 		fmt.Println("Rien ne se passe…")
 	}
 }
@@ -464,24 +501,19 @@ func Forgeron(c *projet.Character) {
 	CraftItem(item)
 }
 
-func equipBonus(item string) int {
-	switch item {
-	case "Chapeau de l'aventurier":
-		return 10
-	case "Tunique de l'aventurier":
-		return 25
-	case "Bottes de l'aventurier":
-		return 15
-	default:
-		return 0
-	}
-}
-
 func recomputeMaxHP(c *projet.Character) {
 	base := c.BaseMaxHP
-	base += equipBonus(c.Equip.Head)
-	base += equipBonus(c.Equip.Chestplate)
-	base += equipBonus(c.Equip.Feet)
+
+	if a, ok := projet.ArmorsDB[c.Equip.Head]; ok {
+		base += a.HPBonus
+	}
+	if a, ok := projet.ArmorsDB[c.Equip.Chestplate]; ok {
+		base += a.HPBonus
+	}
+	if a, ok := projet.ArmorsDB[c.Equip.Feet]; ok {
+		base += a.HPBonus
+	}
+
 	c.MaxHP = base
 	if c.HP > c.MaxHP {
 		c.HP = c.MaxHP
@@ -589,7 +621,7 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 	for {
 		var choix int
 		fmt.Println("===== Votre tour =====")
-		fmt.Println("1. Attaquer (5 dégâts)")
+		fmt.Println("1. Attaquer")
 		fmt.Println("2. Inventaire")
 		fmt.Println("3. Fuir")
 		fmt.Print("Choix : ")
@@ -597,14 +629,35 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 
 		switch choix {
 		case 1:
-			dmg := 5
+			weapons := []string{"Coup de poing"}
+			if c.Equip.Weapon != "" {
+				weapons = append(weapons, c.Equip.Weapon)
+			}
+
+			fmt.Println("— Choisir l’arme —")
+			for i, w := range weapons {
+				min, max := weaponDamageRange(w)
+				fmt.Printf("%d) %s (%d–%d)\n", i+1, w, min, max)
+			}
+			fmt.Print("Arme : ")
+			var wch int
+			fmt.Scan(&wch)
+			if wch < 1 || wch > len(weapons) {
+				fmt.Println("Choix invalide.")
+				continue
+			}
+			wname := weapons[wch-1]
+			min, max := weaponDamageRange(wname)
+			dmg := rollDamage(min, max)
+
 			g.HP -= dmg
 			if g.HP < 0 {
 				g.HP = 0
 			}
-			fmt.Printf("%s attaque et inflige %d dégâts à %s.\n", c.Name, dmg, g.Name)
+			fmt.Printf("%s utilise %s et inflige %d dégâts à %s.\n", c.Name, wname, dmg, g.Name)
 			fmt.Printf("PV de %s : %d / %d\n", g.Name, g.HP, g.MaxHP)
 			return false
+
 		case 2:
 			AccessInventory(c)
 			return FalseIfBothAlive(c, g)
@@ -694,4 +747,66 @@ func initTrainingGoblin() *Monster {
 		HP:    40,
 		ATK:   0,
 	}
+}
+
+func weaponDamageRange(weaponName string) (min, max int) {
+	if ws, ok := projet.WeaponsDB[weaponName]; ok {
+		return ws.Min, ws.Max
+	}
+	// fallback
+	return projet.WeaponsDB["Coup de poing"].Min, projet.WeaponsDB["Coup de poing"].Max
+}
+
+func rollDamage(min, max int) int {
+	if max < min {
+		max = min
+	}
+	return rand.Intn(max-min+1) + min
+}
+
+func equipWeapon(c *projet.Character, name string) {
+	if _, ok := projet.WeaponsDB[name]; !ok {
+		fmt.Println("Ce n’est pas une arme équipable.")
+		return
+	}
+	// remet l’ancienne arme dans l’inventaire
+	if c.Equip.Weapon != "" {
+		c.Inventory = append(c.Inventory, c.Equip.Weapon)
+	}
+	// équipe la nouvelle
+	removeItem(c, name)
+	c.Equip.Weapon = name
+	fmt.Printf("🔪 Arme équipée : %s\n", name)
+}
+
+func equipArmor(c *projet.Character, name string) {
+	a, ok := projet.ArmorsDB[name]
+	if !ok {
+		fmt.Println("Ce n’est pas une armure connue.")
+		return
+	}
+	// retire de l’inventaire
+	removeItem(c, name)
+
+	// remet l’ancien item du slot dans l’inventaire
+	switch a.Slot {
+	case "Head":
+		if c.Equip.Head != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Head)
+		}
+		c.Equip.Head = name
+	case "Chestplate":
+		if c.Equip.Chestplate != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Chestplate)
+		}
+		c.Equip.Chestplate = name
+	case "Feet":
+		if c.Equip.Feet != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Feet)
+		}
+		c.Equip.Feet = name
+	}
+
+	recomputeMaxHP(c)
+	fmt.Printf("🛡️ Armure équipée : %s (+%d PV max)\n", name, a.HPBonus)
 }
