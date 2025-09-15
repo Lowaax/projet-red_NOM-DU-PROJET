@@ -349,7 +349,12 @@ func Menu(c *projet.Character) {
 		case 4:
 			Forgeron(c)
 		case 5:
+			goblinFight(c)
+		case 6:
+			trainingFight(c)
+		case 7:
 			fmt.Println("Au revoir !")
+			return
 		default:
 			fmt.Println("Choix invalide.")
 		}
@@ -548,5 +553,143 @@ func Equipement(c *projet.Character) {
 		return
 	default:
 		fmt.Println("Choix invalide.")
+	}
+}
+
+type Monster struct {
+	Name  string
+	MaxHP int
+	HP    int
+	ATK   int
+}
+
+func goblinPattern(g *Monster, c *projet.Character, turn int) {
+	if g == nil || c == nil {
+		return
+	}
+	dmg := g.ATK
+	if turn%3 == 0 {
+		dmg = g.ATK * 2
+	}
+	c.HP -= dmg
+	if c.HP < 0 {
+		c.HP = 0
+	}
+	fmt.Printf("%s inflige à %s %d dégâts\n", g.Name, c.Name, dmg)
+	fmt.Printf("%s PV : %d / %d\n", c.Name, c.HP, c.MaxHP)
+
+	if c.HP <= 0 {
+		_ = IsDead(c)
+	}
+}
+
+func characterTurn(c *projet.Character, g *Monster) (ended bool) {
+	for {
+		var choix int
+		fmt.Println("===== Votre tour =====")
+		fmt.Println("1. Attaquer (5 dégâts)")
+		fmt.Println("2. Inventaire")
+		fmt.Println("3. Fuir")
+		fmt.Print("Choix : ")
+		fmt.Scan(&choix)
+
+		switch choix {
+		case 1:
+			dmg := 5
+			g.HP -= dmg
+			if g.HP < 0 {
+				g.HP = 0
+			}
+			fmt.Printf("%s utilise Attaque basique et inflige %d dégâts à %s\n", c.Name, dmg, g.Name)
+			fmt.Printf("%s PV : %d / %d\n", g.Name, g.HP, g.MaxHP)
+			return false
+		case 2:
+			AccessInventory(c)
+			return FalseIfBothAlive(c, g)
+		case 3:
+			fmt.Println("Vous fuyez le combat.")
+			return true
+		default:
+			fmt.Println("Choix invalide.")
+		}
+	}
+}
+
+func FalseIfBothAlive(c *projet.Character, g *Monster) bool {
+	if c.HP <= 0 || g.HP <= 0 {
+		return TrueIfAnyDown(c, g)
+	}
+	return false
+}
+
+func TrueIfAnyDown(c *projet.Character, g *Monster) bool {
+	return c.HP <= 0 || g.HP <= 0
+}
+
+func trainingFight(c *projet.Character) {
+	g := initTrainingGoblin()
+	turn := 1
+	fmt.Printf("Un %s apparaît !\n", g.Name)
+
+	for {
+		fmt.Printf("\n===== Tour %d =====\n", turn)
+
+		if characterTurn(c, g) {
+			fmt.Println("Fin du combat.")
+			return
+		}
+		if g.HP <= 0 {
+			fmt.Printf("%s est vaincu !\n", g.Name)
+			fmt.Println("Fin du combat.")
+			return
+		}
+
+		fmt.Println("Le gobelin d'entraînement ne riposte pas.")
+		turn++
+	}
+}
+
+func goblinFight(c *projet.Character) {
+	g := initGoblin()
+	turn := 1
+	fmt.Printf("Un %s apparaît !\n", g.Name)
+
+	for {
+		fmt.Printf("\n===== Tour %d =====\n", turn)
+
+		if characterTurn(c, g) {
+			fmt.Println("Fin du combat.")
+			return
+		}
+		if g.HP <= 0 {
+			fmt.Printf("%s est vaincu !\n", g.Name)
+			fmt.Println("Fin du combat.")
+			return
+		}
+
+		goblinPattern(g, c, turn)
+		if c.HP <= 0 {
+			fmt.Println("Fin du combat.")
+			return
+		}
+		turn++
+	}
+}
+
+func initGoblin() *Monster {
+	return &Monster{
+		Name:  "Gobelin",
+		MaxHP: 40,
+		HP:    40,
+		ATK:   5,
+	}
+}
+
+func initTrainingGoblin() *Monster {
+	return &Monster{
+		Name:  "Gobelin d'entraînement",
+		MaxHP: 40,
+		HP:    40,
+		ATK:   0,
 	}
 }
