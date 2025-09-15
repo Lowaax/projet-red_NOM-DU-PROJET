@@ -35,28 +35,118 @@ func initCharacter(name, race, class string, maxHP int) *projet.Character {
 }
 
 func characterCreation() *projet.Character {
-	var name, class string
+	var name string
 	fmt.Print("Choisissez un nom : ")
 	fmt.Scan(&name)
 	name = strings.Title(strings.ToLower(name))
 
-	fmt.Println("Choisissez une classe : (Humain, Elfe, Nain)")
-	fmt.Scan(&class)
+	fmt.Println("Choisissez une RACE :")
+	fmt.Println(" 1) Human")
+	fmt.Println(" 2) Elf")
+	fmt.Println(" 3) Nain")
+	fmt.Println(" 4) Orc")
+	fmt.Println(" 5) Dragon")
+	fmt.Println(" 6) Mort-vivant")
+	fmt.Println(" 7) Ange")
+	fmt.Println(" 8) Orque")
+	fmt.Println(" 9) Centaure")
+	fmt.Println("10) Fée")
+	fmt.Println("11) Lycanthrope")
+	fmt.Println("12) Farfadet")
+	fmt.Println("13) Antromorphe")
+	fmt.Print("Votre choix (numéro) : ")
 
-	var maxHP int
-	switch strings.ToLower(class) {
-	case "humain":
-		maxHP = 100
-	case "elfe":
-		maxHP = 80
-	case "nain":
-		maxHP = 120
+	var raceChoice int
+	fmt.Scan(&raceChoice)
+
+	race := "Human"
+	maxHP := 100
+	switch raceChoice {
+	case 1: // Human
+		race, maxHP = "Human", 100
+	case 2: // Elf
+		race, maxHP = "Elf", 80
+	case 3: // Nain
+		race, maxHP = "Nain", 120
+	case 4: // Orc
+		race, maxHP = "Orc", 110
+	case 5: // Dragon
+		race, maxHP = "Dragon", 140
+	case 6: // Mort-vivant
+		race, maxHP = "Mort-vivant", 90
+	case 7: // Ange
+		race, maxHP = "Ange", 100
+	case 8: // Orque (syno d’orc séparé dans ta liste)
+		race, maxHP = "Orque", 110
+	case 9: // Centaure
+		race, maxHP = "Centaure", 110
+	case 10: // Fée
+		race, maxHP = "Fée", 70
+	case 11: // Lycanthrope
+		race, maxHP = "Lycanthrope", 120
+	case 12: // Farfadet
+		race, maxHP = "Farfadet", 75
+	case 13: // Antromorphe
+		race, maxHP = "Antromorphe", 100
 	default:
-		maxHP = 100
-		class = "Humain"
+		fmt.Println("Entrée invalide → race par défaut : Human (100 PV).")
 	}
 
-	return initCharacter(name, "A définir", class, maxHP)
+	fmt.Println("Choisissez une CLASSE :")
+	fmt.Println(" 1) Chevalier")
+	fmt.Println(" 2) Sorcier")
+	fmt.Println(" 3) Archer")
+	fmt.Println(" 4) Assassin")
+	fmt.Println(" 5) Prêtre")
+	fmt.Println(" 6) Necromancien")
+	fmt.Println(" 7) Berserker")
+	fmt.Print("Votre choix (numéro) : ")
+
+	var classChoice int
+	fmt.Scan(&classChoice)
+
+	class := "Chevalier"
+	switch classChoice {
+	case 1:
+		class = "Chevalier"
+	case 2:
+		class = "Sorcier"
+	case 3:
+		class = "Archer"
+	case 4:
+		class = "Assassin"
+	case 5:
+		class = "Prêtre"
+	case 6:
+		class = "Necromancien"
+	case 7:
+		class = "Berserker"
+	default:
+		fmt.Println("Entrée invalide → classe par défaut : Chevalier.")
+	}
+
+	// Création du perso avec PV selon la race (HP init = 50% dans initCharacter)
+	c := initCharacter(name, race, class, maxHP)
+
+	// --- STUFF DE BASE PAR CLASSE (simple et direct) ---
+	switch class {
+	case "Chevalier":
+		c.Inventory = append(c.Inventory, "Épée courte", "Bouclier en bois", "Armure rembourrée")
+	case "Sorcier":
+		c.Inventory = append(c.Inventory, "Bâton usé", "Robe simple", "Grimoire débutant")
+	case "Archer":
+		c.Inventory = append(c.Inventory, "Arc court", "Carquois (x20)", "Tunique légère")
+	case "Assassin":
+		c.Inventory = append(c.Inventory, "Dague", "Cape sombre", "Bottes souples")
+	case "Prêtre":
+		c.Inventory = append(c.Inventory, "Masse légère", "Robe bénie", "Amulette")
+	case "Necromancien":
+		c.Inventory = append(c.Inventory, "Bâton d’os", "Robe noire", "Talisman occulte")
+	case "Berserker":
+		c.Inventory = append(c.Inventory, "Hache rouillée", "Bandeau", "Ceinture de cuir")
+	}
+
+	return c
 }
 
 func displayInfo(c *projet.Character) {
