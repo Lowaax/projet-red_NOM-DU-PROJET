@@ -33,6 +33,11 @@ func initCharacter(name, race, class string, maxHP int) *projet.Character {
 		Gold:              100,
 		MaxInventory:      10,
 		InventoryUpgrades: 0,
+		MaxMana:           10,
+		Mana:              10,
+		Initiative:        5,
+		Exp:               0,
+		ExpMax:            10,
 	}
 }
 
@@ -178,6 +183,9 @@ func displayInfo(c *projet.Character) {
 	fmt.Println("Classe    :", c.Class)
 	fmt.Println("Niveau    :", c.Level)
 	fmt.Println("PV        :", c.HP, "/", c.MaxHP)
+	fmt.Printf("Mana      : %d / %d\n", c.Mana, c.MaxMana)
+	fmt.Printf("Initiative: %d\n", c.Initiative)
+	fmt.Printf("XP        : %d / %d\n", c.Exp, c.ExpMax)
 	fmt.Printf("Équipé    : Arme[%s] Tête[%s] Torse[%s] Pieds[%s]\n",
 		func() string {
 			if c.Equip.Weapon == "" {
@@ -223,6 +231,8 @@ func AccessInventory(c *projet.Character) {
 		poisonPot(c)
 	case "Livre de Sort : Boule de Feu":
 		spellBook(c)
+	case "Potion de mana":
+		manaPot(c)
 
 	default:
 		if _, ok := projet.WeaponsDB[item]; ok && item != "Coup de poing" {
@@ -258,6 +268,16 @@ func poisonPot(c *projet.Character) {
 	}
 }
 
+func manaPot(c *projet.Character) {
+	removeItem(c, "Potion de mana")
+	restore := 15
+	c.Mana += restore
+	if c.Mana > c.MaxMana {
+		c.Mana = c.MaxMana
+	}
+	fmt.Printf("✨ Potion de mana utilisée ! Mana : %d/%d\n", c.Mana, c.MaxMana)
+}
+
 func spellBook(c *projet.Character) {
 	for _, s := range c.Skills {
 		if s == "Boule de Feu" {
@@ -266,7 +286,6 @@ func spellBook(c *projet.Character) {
 		}
 	}
 	c.Skills = append(c.Skills, "Boule de Feu")
-	removeItem(c, "Livre de Sort : Boule de Feu")
 	fmt.Println("🔥 Nouveau sort appris : Boule de Feu !")
 }
 
@@ -299,6 +318,7 @@ func Shop(c *projet.Character) {
 	fmt.Println("6: Cuir de Sanglier (3 or)")
 	fmt.Println("7: Plume de Corbeau (1 or)")
 	fmt.Println("8: Augmentation d'inventaire (+10 slots, 30 or)  — max 3")
+	fmt.Println("9: Potion de mana (5 or)")
 	fmt.Println("0: Retour")
 	fmt.Print("Choix : ")
 	fmt.Scan(&choix)
@@ -316,6 +336,7 @@ func Shop(c *projet.Character) {
 		5: {"Peau de Troll", 7},
 		6: {"Cuir de Sanglier", 3},
 		7: {"Plume de Corbeau", 1},
+		9: {"Potion de mana", 5},
 	}
 
 	if offer, ok := offers[choix]; ok {
@@ -503,7 +524,6 @@ func Forgeron(c *projet.Character) {
 
 func recomputeMaxHP(c *projet.Character) {
 	base := c.BaseMaxHP
-
 	if a, ok := projet.ArmorsDB[c.Equip.Head]; ok {
 		base += a.HPBonus
 	}
@@ -513,7 +533,6 @@ func recomputeMaxHP(c *projet.Character) {
 	if a, ok := projet.ArmorsDB[c.Equip.Feet]; ok {
 		base += a.HPBonus
 	}
-
 	c.MaxHP = base
 	if c.HP > c.MaxHP {
 		c.HP = c.MaxHP
@@ -589,14 +608,16 @@ func Equipement(c *projet.Character) {
 }
 
 type Monster struct {
-	Name  string
-	MaxHP int
-	HP    int
-	ATK   int
+	Name       string
+	MaxHP      int
+	HP         int
+	ATK        int
+	Initiative int // ← utilisé pour comparer
+	XPReward   int
 }
 
 func goblinPattern(g *Monster, c *projet.Character, turn int) {
-	if g == nil || c == nil {
+	if g == nil || c == nil || g.HP <= 0 {
 		return
 	}
 	dmg := g.ATK
@@ -611,7 +632,6 @@ func goblinPattern(g *Monster, c *projet.Character, turn int) {
 		c.HP = 0
 	}
 	fmt.Printf("PV de %s : %d / %d\n", c.Name, c.HP, c.MaxHP)
-
 	if c.HP <= 0 {
 		_ = IsDead(c)
 	}
@@ -624,6 +644,7 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 		fmt.Println("1. Attaquer")
 		fmt.Println("2. Inventaire")
 		fmt.Println("3. Fuir")
+		fmt.Println("4. Sorts")
 		fmt.Print("Choix : ")
 		fmt.Scan(&choix)
 
@@ -664,6 +685,9 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 		case 3:
 			fmt.Println("Vous fuyez le combat.")
 			return true
+		case 4:
+			castSpell(c, g)
+			return FalseIfBothAlive(c, g)
 		default:
 			fmt.Println("Choix invalide.")
 		}
@@ -684,21 +708,27 @@ func TrueIfAnyDown(c *projet.Character, g *Monster) bool {
 func trainingFight(c *projet.Character) {
 	g := initTrainingGoblin()
 	turn := 1
-	fmt.Printf("Un %s apparaît !\n", g.Name)
+	fmt.Printf("Un %s apparaît ! (ATK %d, Init %d)\n", g.Name, g.ATK, g.Initiative)
+
+	firstPlayer := playerStarts(c, g)
+	if firstPlayer {
+		fmt.Printf("🟩 %s commence (Initiative %d) !\n", c.Name, c.Initiative)
+	} else {
+		fmt.Printf("🟥 %s commence (Initiative %d) !\n", g.Name, g.Initiative)
+	}
 
 	for {
 		fmt.Printf("\n===== Tour %d =====\n", turn)
-
 		if characterTurn(c, g) {
 			fmt.Println("Fin du combat.")
 			return
 		}
 		if g.HP <= 0 {
 			fmt.Printf("%s est vaincu !\n", g.Name)
+			rewardVictory(c, g)
 			fmt.Println("Fin du combat.")
 			return
 		}
-
 		fmt.Println("Le gobelin d'entraînement ne riposte pas.")
 		turn++
 	}
@@ -707,25 +737,50 @@ func trainingFight(c *projet.Character) {
 func goblinFight(c *projet.Character) {
 	g := initGoblin()
 	turn := 1
-	fmt.Printf("Un %s apparaît !\n", g.Name)
+	fmt.Printf("Un %s apparaît ! (ATK %d, Init %d)\n", g.Name, g.ATK, g.Initiative)
+
+	firstPlayer := playerStarts(c, g)
+	if firstPlayer {
+		fmt.Printf("🟩 %s commence (Initiative %d) !\n", c.Name, c.Initiative)
+	} else {
+		fmt.Printf("🟥 %s commence (Initiative %d) !\n", g.Name, g.Initiative)
+	}
 
 	for {
 		fmt.Printf("\n===== Tour %d =====\n", turn)
 
-		if characterTurn(c, g) {
-			fmt.Println("Fin du combat.")
-			return
-		}
-		if g.HP <= 0 {
-			fmt.Printf("%s est vaincu !\n", g.Name)
-			fmt.Println("Fin du combat.")
-			return
-		}
-
-		goblinPattern(g, c, turn)
-		if c.HP <= 0 {
-			fmt.Println("Fin du combat.")
-			return
+		if firstPlayer {
+			if characterTurn(c, g) {
+				fmt.Println("Fin du combat.")
+				return
+			}
+			if g.HP <= 0 {
+				fmt.Printf("%s est vaincu !\n", g.Name)
+				rewardVictory(c, g)
+				fmt.Println("Fin du combat.")
+				return
+			}
+			goblinPattern(g, c, turn)
+			if c.HP <= 0 {
+				fmt.Println("Fin du combat.")
+				return
+			}
+		} else {
+			goblinPattern(g, c, turn)
+			if c.HP <= 0 {
+				fmt.Println("Fin du combat.")
+				return
+			}
+			if characterTurn(c, g) {
+				fmt.Println("Fin du combat.")
+				return
+			}
+			if g.HP <= 0 {
+				fmt.Printf("%s est vaincu !\n", g.Name)
+				rewardVictory(c, g) // ← ICI aussi
+				fmt.Println("Fin du combat.")
+				return
+			}
 		}
 		turn++
 	}
@@ -733,19 +788,23 @@ func goblinFight(c *projet.Character) {
 
 func initGoblin() *Monster {
 	return &Monster{
-		Name:  "Gobelin",
-		MaxHP: 40,
-		HP:    40,
-		ATK:   5,
+		Name:       "Gobelin",
+		MaxHP:      40,
+		HP:         40,
+		ATK:        5,
+		Initiative: 6,
+		XPReward:   10,
 	}
 }
 
 func initTrainingGoblin() *Monster {
 	return &Monster{
-		Name:  "Gobelin d'entraînement",
-		MaxHP: 40,
-		HP:    40,
-		ATK:   0,
+		Name:       "Gobelin d'entraînement",
+		MaxHP:      40,
+		HP:         40,
+		ATK:        0,
+		Initiative: 4,
+		XPReward:   2,
 	}
 }
 
@@ -809,4 +868,94 @@ func equipArmor(c *projet.Character, name string) {
 
 	recomputeMaxHP(c)
 	fmt.Printf("🛡️ Armure équipée : %s (+%d PV max)\n", name, a.HPBonus)
+}
+
+func playerStarts(c *projet.Character, g *Monster) bool {
+	if c.Initiative > g.Initiative {
+		return true
+	}
+	if c.Initiative < g.Initiative {
+		return false
+	}
+	return rand.Intn(2) == 0
+}
+
+func rewardVictory(c *projet.Character, g *Monster) {
+	if g.XPReward <= 0 {
+		return
+	}
+	fmt.Printf("🏅 %s gagne %d XP.\n", c.Name, g.XPReward)
+	c.Exp += g.XPReward
+	for c.Exp >= c.ExpMax {
+		c.Exp -= c.ExpMax
+		levelUp(c)
+	}
+	displayInfo(c)
+}
+
+func levelUp(c *projet.Character) {
+	c.Level++
+	c.BaseMaxHP += 5
+	recomputeMaxHP(c)
+	c.MaxMana += 2
+	c.Initiative += 1
+	c.ExpMax += 10
+	c.HP = c.MaxHP
+	c.Mana = c.MaxMana
+	fmt.Printf("⬆️  Niveau %d ! (+5 PV max, +2 Mana max, +1 Initiative)\n", c.Level)
+}
+
+func castSpell(c *projet.Character, g *Monster) (ended bool) {
+	if len(c.Skills) == 0 {
+		fmt.Println("Vous ne connaissez aucun sort.")
+		return false
+	}
+
+	spellCost := map[string]int{
+		"Coup de poing": 3,
+		"Boule de Feu":  7,
+	}
+	spellDamage := map[string]int{
+		"Coup de poing": 8,
+		"Boule de Feu":  18,
+	}
+
+	known := []string{}
+	for _, s := range c.Skills {
+		if _, ok := spellDamage[s]; ok {
+			known = append(known, s)
+		}
+	}
+	if len(known) == 0 {
+		fmt.Println("Aucun sort offensif disponible.")
+		return false
+	}
+
+	fmt.Println("— Choisir un sort —")
+	for i, s := range known {
+		fmt.Printf("%d) %s (coût %d mana, %d dégâts)\n", i+1, s, spellCost[s], spellDamage[s])
+	}
+	fmt.Print("Sort : ")
+	var sch int
+	fmt.Scan(&sch)
+	if sch < 1 || sch > len(known) {
+		fmt.Println("Choix invalide.")
+		return false
+	}
+	name := known[sch-1]
+	cost := spellCost[name]
+	dmg := spellDamage[name]
+
+	if c.Mana < cost {
+		fmt.Printf("❌ Mana insuffisant (%d/%d). Ce sort nécessite %d mana.\n", c.Mana, c.MaxMana, cost)
+		return false
+	}
+	c.Mana -= cost
+	g.HP -= dmg
+	if g.HP < 0 {
+		g.HP = 0
+	}
+	fmt.Printf("%s lance %s et inflige %d dégâts à %s. (Mana %d/%d)\n", c.Name, name, dmg, g.Name, c.Mana, c.MaxMana)
+	fmt.Printf("PV de %s : %d / %d\n", g.Name, g.HP, g.MaxHP)
+	return false
 }

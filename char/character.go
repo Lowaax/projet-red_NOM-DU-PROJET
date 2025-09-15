@@ -34,14 +34,24 @@ type Character struct {
 	BaseMaxHP         int
 	MaxHP             int
 	HP                int
+	MaxMana           int
+	Mana              int
+	Initiative        int
+	Exp               int
+	ExpMax            int
 	Inventory         []string
-	Skills            []string
-	Gold              int
 	MaxInventory      int
 	InventoryUpgrades int
-	Equip             Equipment
-}
+	Gold              int
+	Skills            []string
 
+	Equip struct {
+		Head       string
+		Chestplate string
+		Feet       string
+		Weapon     string
+	}
+}
 type Equipment struct {
 	Head       string
 	Chestplate string
@@ -61,7 +71,7 @@ type ArmorStats struct {
 	HPBonus int
 }
 
-var WeaponsDB = map[string]WeaponStats{
+var WeaponsDB = map[string]struct{ Min, Max int }{
 	"Coup de poing":  {Min: 3, Max: 5},
 	"Épée courte":    {Min: 5, Max: 8},
 	"Bâton usé":      {Min: 4, Max: 7},
@@ -72,7 +82,10 @@ var WeaponsDB = map[string]WeaponStats{
 	"Hache rouillée": {Min: 6, Max: 9},
 }
 
-var ArmorsDB = map[string]ArmorStats{
+var ArmorsDB = map[string]struct {
+	Slot    string // "Head" | "Chestplate" | "Feet"
+	HPBonus int
+}{
 	"Chapeau de l'aventurier": {Slot: "Head", HPBonus: 10},
 	"Tunique de l'aventurier": {Slot: "Chestplate", HPBonus: 25},
 	"Bottes de l'aventurier":  {Slot: "Feet", HPBonus: 15},
