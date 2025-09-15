@@ -11,7 +11,7 @@ var Races = []string{
 	"Orque",
 	"Centaure",
 	"Fée",
-	"Lycanthrope",
+	"Vampire",
 	"Farfadet",
 	"Antromorphe",
 }

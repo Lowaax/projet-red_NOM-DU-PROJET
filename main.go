@@ -58,7 +58,7 @@ func characterCreation() *projet.Character {
 	fmt.Println(" 8) Orque")
 	fmt.Println(" 9) Centaure")
 	fmt.Println("10) Fée")
-	fmt.Println("11) Lycanthrope")
+	fmt.Println("11) Vampire")
 	fmt.Println("12) Farfadet")
 	fmt.Println("13) Antromorphe")
 	fmt.Print("Votre choix (numéro) : ")
@@ -89,8 +89,8 @@ func characterCreation() *projet.Character {
 		race, maxHP = "Centaure", 110
 	case 10: // Fée
 		race, maxHP = "Fée", 70
-	case 11: // Lycanthrope
-		race, maxHP = "Lycanthrope", 120
+	case 11: // Vampire
+		race, maxHP = "Vampire", 100
 	case 12: // Farfadet
 		race, maxHP = "Farfadet", 75
 	case 13: // Antromorphe
