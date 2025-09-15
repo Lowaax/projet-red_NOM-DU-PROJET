@@ -438,7 +438,6 @@ func Equipement(c *projet.Character) {
 		fmt.Println("Choix invalide.")
 	}
 }
-<<<<<<< HEAD
 
 func GoblinPattern(c *projet.Character) {
 	goblin := projet.InitGoblin()
@@ -675,5 +674,7 @@ func trainingFight(player *projet.Character) {
 
 	fmt.Println("Fin du combat")
 }
+=======
+>>>>>>> parent of 11df4d9 (Update main.go)
 =======
 >>>>>>> parent of 11df4d9 (Update main.go)
