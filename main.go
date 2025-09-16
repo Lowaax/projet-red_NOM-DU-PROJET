@@ -971,7 +971,7 @@ func castSpell(c *projet.Character, g *Monster) (ended bool) {
 	if c.Mana < cost {
 		fmt.Printf("❌ Mana insuffisant (%d/%d). Ce sort nécessite %d mana.\n", c.Mana, c.MaxMana, cost)
 		return false
-	}
+	} 
 	c.Mana -= cost
 	g.HP -= dmg
 	if g.HP < 0 {

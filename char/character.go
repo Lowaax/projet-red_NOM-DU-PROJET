@@ -101,4 +101,8 @@ var ArmureDB = map[string]struct {
 	"Robe bénie":              {Slot: "Torse", HPBonus: 12},
 	"Robe noire":              {Slot: "Torse", HPBonus: 10},
 	"Bottes souples":          {Slot: "Pieds", HPBonus: 5},
+	"Amulette de protection":  {Slot: "Talisman", HPBonus: 10},
+	"Talisman occulte":        {Slot: "Talisman", HPBonus: 15},
+	"Bandeau":                 {Slot: "Tête", HPBonus: 8},
+	"Ceinture de cuir":        {Slot: "Ceinture", HPBonus: 5},
 }
