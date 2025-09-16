@@ -73,6 +73,7 @@ type ArmeStats struct {
 type ArmureStats struct {
 	Slot    string // "Tête", "Torse", "Pieds"
 	HPBonus int
+	ManaBonus int
 }
 
 var ArmeDB = map[string]struct{ Min, Max int }{
@@ -90,6 +91,7 @@ var ArmeDB = map[string]struct{ Min, Max int }{
 var ArmureDB = map[string]struct {
 	Slot    string // "Tête" | "Torse" | "Pieds"
 	HPBonus int
+	ManaBonus int
 }{
 	"Chapeau de l'aventurier": {Slot: "Tête", HPBonus: 10},
 	"Tunique de l'aventurier": {Slot: "Torse", HPBonus: 25},
