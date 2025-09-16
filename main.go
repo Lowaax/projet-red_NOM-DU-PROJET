@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	projet "projet_red_NOM-DU-PROJET/char"
 	"strings"
@@ -176,6 +177,10 @@ func characterCreation() *projet.Character {
 		c.Equip.Ceinture = "Ceinture de cuir"
 	}
 
+	if c.Race == "Vampire" && c.Equip.Arme != "Dague vampirique" {
+		addItem(c, "Dague vampirique")
+	}
+
 	recomputeMaxHP(c)
 	return c
 }
@@ -232,7 +237,7 @@ func AccessInventory(c *projet.Character) {
 	case "Potion":
 		takePot(c)
 	case "Potion de poison":
-		poisonPot(c)
+		fmt.Println("Cette potion est utilisable uniquement en combat pour empoisonner un ennemi.")
 	case "Livre de Sort : Boule de Feu":
 		spellBook(c)
 	case "Potion de mana":
@@ -260,16 +265,10 @@ func takePot(c *projet.Character) {
 	fmt.Printf("✅ Potion utilisée ! PV : %d/%d\n", c.HP, c.MaxHP)
 }
 
-func poisonPot(c *projet.Character) {
+func poisonPotEnemy(c *projet.Character, g *Monster) {
 	removeItem(c, "Potion de poison")
-	for i := 1; i <= 3; i++ {
-		time.Sleep(1 * time.Second)
-		c.HP -= 10
-		fmt.Printf("☠️ Poison tick %d → PV : %d/%d\n", i, c.HP, c.MaxHP)
-	}
-	if c.HP <= 0 {
-		IsDead(c)
-	}
+	g.PoisonTurns = 3
+	fmt.Printf("☠️  Vous empoisonnez %s pour 3 tours. Les dégâts s'appliqueront au début de son tour.\n", g.Name)
 }
 
 func manaPot(c *projet.Character) {
@@ -612,12 +611,13 @@ func Equipement(c *projet.Character) {
 }
 
 type Monster struct {
-	Name       string
-	MaxHP      int
-	HP         int
-	ATK        int
-	Initiative int // ← utilisé pour comparer
-	XPReward   int
+	Name        string
+	MaxHP       int
+	HP          int
+	ATK         int
+	Initiative  int // ← utilisé pour comparer
+	XPReward    int
+	PoisonTurns int
 }
 
 func goblinPattern(g *Monster, c *projet.Character, turn int) {
@@ -642,6 +642,7 @@ func goblinPattern(g *Monster, c *projet.Character, turn int) {
 }
 
 func characterTurn(c *projet.Character, g *Monster) (ended bool) {
+
 	for {
 		var choix int
 		fmt.Println("===== Votre tour =====")
@@ -675,6 +676,13 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 			min, max := weaponDamageRange(wname)
 			dmg := rollDamage(min, max)
 
+			if wname == "Dague vampirique" {
+				dealt, healed := VoleDeVie(c, g, dmg, 0.35)
+				fmt.Printf("%s utilise %s : %d dégats et %d PV volés. PV %s : %d/%d \n", c.Name, wname, dealt, healed, c.Name, c.HP, c.MaxHP)
+				fmt.Printf("PV de %s : %d / %d\n", g.Name, g.HP, g.MaxHP)
+				return false
+			}
+
 			g.HP -= dmg
 			if g.HP < 0 {
 				g.HP = 0
@@ -684,7 +692,7 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 			return false
 
 		case 2:
-			AccessInventory(c)
+			AccessInventoryFight(c, g) // ← au lieu de AccessInventory(c)
 			return FalseIfBothAlive(c, g)
 		case 3:
 			fmt.Println("Vous fuyez le combat.")
@@ -733,6 +741,11 @@ func trainingFight(c *projet.Character) {
 			fmt.Println("Fin du combat.")
 			return
 		}
+		if startOfMonsterTurn(g, c) {
+			rewardVictory(c, g)
+			fmt.Println("Fin du combat.")
+			return
+		}
 		fmt.Println("Le gobelin d'entraînement ne riposte pas.")
 		turn++
 	}
@@ -764,12 +777,22 @@ func goblinFight(c *projet.Character) {
 				fmt.Println("Fin du combat.")
 				return
 			}
+			if startOfMonsterTurn(g, c) {
+				rewardVictory(c, g)
+				fmt.Println("Fin du combat.")
+				return
+			}
 			goblinPattern(g, c, turn)
 			if c.HP <= 0 {
 				fmt.Println("Fin du combat.")
 				return
 			}
 		} else {
+			if startOfMonsterTurn(g, c) {
+				rewardVictory(c, g)
+				fmt.Println("Fin du combat.")
+				return
+			}
 			goblinPattern(g, c, turn)
 			if c.HP <= 0 {
 				fmt.Println("Fin du combat.")
@@ -957,4 +980,92 @@ func castSpell(c *projet.Character, g *Monster) (ended bool) {
 	fmt.Printf("%s lance %s et inflige %d dégâts à %s. (Mana %d/%d)\n", c.Name, name, dmg, g.Name, c.Mana, c.MaxMana)
 	fmt.Printf("PV de %s : %d / %d\n", g.Name, g.HP, g.MaxHP)
 	return false
+}
+
+func startOfMonsterTurn(g *Monster, c *projet.Character) bool {
+	if g.PoisonTurns > 0 {
+		const dmg = 10
+		g.PoisonTurns--
+		g.HP -= dmg
+		if g.HP < 0 {
+			g.HP = 0
+		}
+		fmt.Printf("☠️  Poison sur %s : -%d PV au début de son tour (%d tour(s) restant).\n", g.Name, dmg, g.PoisonTurns)
+		if g.HP <= 0 {
+			fmt.Printf("%s succombe au poison !\n", g.Name)
+			return true
+		}
+	}
+	return false
+}
+
+func AccessInventoryFight(c *projet.Character, g *Monster) {
+	fmt.Println("===== Inventaire =====")
+	if len(c.Inventory) == 0 {
+		fmt.Println("Inventaire vide.")
+		return
+	}
+	for i, item := range c.Inventory {
+		fmt.Printf("%d. %s\n", i+1, item)
+	}
+	fmt.Println("0. Retour")
+
+	var choix int
+	fmt.Print("Choix : ")
+	fmt.Scan(&choix)
+	if choix <= 0 || choix > len(c.Inventory) {
+		return
+	}
+
+	item := c.Inventory[choix-1]
+	switch item {
+	case "Potion":
+		takePot(c)
+	case "Potion de mana":
+		manaPot(c)
+	case "Livre de Sort : Boule de Feu":
+		spellBook(c)
+	case "Potion de poison":
+		poisonPotEnemy(c, g) // ← empoisonne le MONSTRE
+	default:
+		if _, ok := projet.ArmeDB[item]; ok && item != "Coup de poing" {
+			equipWeapon(c, item)
+			return
+		}
+		if _, ok := projet.ArmureDB[item]; ok {
+			equipArmor(c, item)
+			return
+		}
+		fmt.Println("Rien ne se passe…")
+	}
+}
+
+func VoleDeVieCharVsMonstre(attacker *projet.Character, cible *Monster, dmg int, ratio float64) (int, int) {
+	if attacker == nil || cible == nil || dmg <= 0 {
+		return 0, 0
+	}
+	if ratio < 0 {
+		ratio = 0
+	} else if ratio > 1 {
+		ratio = 1
+	}
+
+	dealt := dmg
+	if dealt > cible.HP {
+		dealt = cible.HP
+	}
+	cible.HP -= dealt
+
+	healed := int(math.Round(float64(dealt) * ratio))
+	if healed > 0 {
+		attacker.HP += healed
+		if attacker.HP > attacker.MaxHP {
+			attacker.HP = attacker.MaxHP
+		}
+	}
+	return dealt, healed
+}
+
+func VoleDeVie(attacker *projet.Character, cible *Monster, dmg int, ratio float64) (int, int) {
+	return VoleDeVieCharVsMonstre(attacker, cible, dmg, ratio)
 }

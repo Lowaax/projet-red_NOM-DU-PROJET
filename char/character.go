@@ -46,23 +46,23 @@ type Character struct {
 	Skills            []string
 
 	Equip struct {
-		Tête       string
-		Torse string
-		Pieds       string
+		Tête     string
+		Torse    string
+		Pieds    string
 		Arme     string
-		Talisman  string
-		Gants      string
-		Ceinture	string 
+		Talisman string
+		Gants    string
+		Ceinture string
 	}
 }
 type Equipment struct {
-	Tête       string
-	Torse string
-	Gants      string
-	Ceinture	string 
-	Pieds       string
+	Tête     string
+	Torse    string
+	Gants    string
+	Ceinture string
+	Pieds    string
 	Arme     string
-	Talisman  string
+	Talisman string
 }
 
 type ArmeStats struct {
@@ -76,14 +76,15 @@ type ArmureStats struct {
 }
 
 var ArmeDB = map[string]struct{ Min, Max int }{
-	"Coup de poing":  {Min: 3, Max: 5},
-	"Épée courte":    {Min: 5, Max: 8},
-	"Bâton usé":      {Min: 4, Max: 7},
-	"Arc court":      {Min: 5, Max: 8},
-	"Dague":          {Min: 4, Max: 9},
-	"Masse légère":   {Min: 5, Max: 7},
-	"Bâton d’os":     {Min: 4, Max: 8},
-	"Hache rouillée": {Min: 6, Max: 9},
+	"Coup de poing":    {Min: 3, Max: 5},
+	"Épée courte":      {Min: 5, Max: 8},
+	"Bâton usé":        {Min: 4, Max: 7},
+	"Arc court":        {Min: 5, Max: 8},
+	"Dague":            {Min: 4, Max: 9},
+	"Masse légère":     {Min: 5, Max: 7},
+	"Bâton d’os":       {Min: 4, Max: 8},
+	"Hache rouillée":   {Min: 6, Max: 9},
+	"Dague vampirique": {Min: 5, Max: 7},
 }
 
 var ArmureDB = map[string]struct {
@@ -93,11 +94,11 @@ var ArmureDB = map[string]struct {
 	"Chapeau de l'aventurier": {Slot: "Tête", HPBonus: 10},
 	"Tunique de l'aventurier": {Slot: "Torse", HPBonus: 25},
 	"Bottes de l'aventurier":  {Slot: "Pieds", HPBonus: 15},
-	"Armure rembourrée": {Slot: "Torse", HPBonus: 15},
-	"Robe simple":       {Slot: "Torse", HPBonus: 10},
-	"Tunique légère":    {Slot: "Torse", HPBonus: 8},
-	"Cape sombre":       {Slot: "Torse", HPBonus: 5},
-	"Robe bénie":        {Slot: "Torse", HPBonus: 12},
-	"Robe noire":        {Slot: "Torse", HPBonus: 10},
-	"Bottes souples":    {Slot: "Pieds", HPBonus: 5},
+	"Armure rembourrée":       {Slot: "Torse", HPBonus: 15},
+	"Robe simple":             {Slot: "Torse", HPBonus: 10},
+	"Tunique légère":          {Slot: "Torse", HPBonus: 8},
+	"Cape sombre":             {Slot: "Torse", HPBonus: 5},
+	"Robe bénie":              {Slot: "Torse", HPBonus: 12},
+	"Robe noire":              {Slot: "Torse", HPBonus: 10},
+	"Bottes souples":          {Slot: "Pieds", HPBonus: 5},
 }
