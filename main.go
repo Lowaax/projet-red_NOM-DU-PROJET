@@ -13,11 +13,6 @@ func main() {
 	c1 := characterCreation()
 	rand.Seed(time.Now().UnixNano())
 	Menu(c1)
-	//displayInfo(c1)
-	//accessInventory(c1)
-	//takePot(c1)
-	//displayInfo(c1)
-	//accessInventory(c1)
 }
 
 func initCharacter(name, race, class string, maxHP int, mana int) *projet.Character {
@@ -70,31 +65,31 @@ func characterCreation() *projet.Character {
 	race := "Human"
 	maxHP := 100
 	switch raceChoice {
-	case 1: // Human
+	case 1:
 		race, maxHP, mana = "Human", 100, 100
-	case 2: // Elf
+	case 2:
 		race, maxHP, mana = "Elf", 80, 140
-	case 3: // Nain
+	case 3:
 		race, maxHP, mana = "Nain", 120, 60
-	case 4: // Orc
+	case 4:
 		race, maxHP, mana = "Orc", 130, 30
-	case 5: // Dragon
+	case 5:
 		race, maxHP, mana = "Dragon", 140, 120
-	case 6: // Mort-vivant
+	case 6:
 		race, maxHP, mana = "Mort-vivant", 90, 90
-	case 7: // Ange
+	case 7:
 		race, maxHP, mana = "Ange", 110, 110
-	case 8: // Orque (syno d’orc séparé dans ta liste)
+	case 8:
 		race, maxHP, mana = "Orque", 120, 30
-	case 9: // Centaure
+	case 9:
 		race, maxHP, mana = "Centaure", 110, 40
-	case 10: // Fée
+	case 10:
 		race, maxHP, mana = "Fée", 70, 140
-	case 11: // Vampire
+	case 11:
 		race, maxHP, mana = "Vampire", 100, 120
-	case 12: // Farfadet
+	case 12:
 		race, maxHP, mana = "Farfadet", 75, 130
-	case 13: // Antromorphe
+	case 13:
 		race, maxHP, mana = "Antromorphe", 100, 110
 	default:
 		fmt.Println("Entrée invalide → race par défaut : Human (100 PV et 100 Mana).")
@@ -133,7 +128,6 @@ func characterCreation() *projet.Character {
 		fmt.Println("Entrée invalide → classe par défaut : Chevalier.")
 	}
 
-	// Création du perso avec PV selon la race (HP init = 50% dans initCharacter)
 	c := initCharacter(name, race, class, maxHP, mana)
 
 	switch class {
@@ -141,35 +135,29 @@ func characterCreation() *projet.Character {
 		c.Inventory = append(c.Inventory, "Épée courte", "Armure rembourrée")
 		c.Equip.Arme = "Épée courte"
 		c.Equip.Torse = "Armure rembourrée"
-
 	case "Sorcier":
 		c.Inventory = append(c.Inventory, "Bâton usé", "Robe simple", "Grimoire débutant")
 		c.Equip.Arme = "Bâton usé"
 		c.Equip.Torse = "Robe simple"
-
 	case "Archer":
 		c.Inventory = append(c.Inventory, "Arc court", "Carquois (x20)", "Tunique légère")
 		c.Equip.Arme = "Arc court"
 		c.Equip.Torse = "Tunique légère"
-
 	case "Assassin":
 		c.Inventory = append(c.Inventory, "Dague", "Cape sombre", "Bottes souples")
 		c.Equip.Arme = "Dague"
 		c.Equip.Torse = "Cape sombre"
 		c.Equip.Pieds = "Bottes souples"
-
 	case "Prêtre":
 		c.Inventory = append(c.Inventory, "Masse légère", "Robe bénie", "Amulette de protection")
 		c.Equip.Arme = "Masse légère"
 		c.Equip.Torse = "Robe bénie"
 		c.Equip.Talisman = "Amulette de protection"
-
 	case "Necromancien":
 		c.Inventory = append(c.Inventory, "Bâton d’os", "Robe noire", "Talisman occulte")
 		c.Equip.Arme = "Bâton d’os"
 		c.Equip.Torse = "Robe noire"
 		c.Equip.Talisman = "Talisman occulte"
-
 	case "Berserker":
 		c.Inventory = append(c.Inventory, "Hache rouillée", "Bandeau", "Ceinture de cuir")
 		c.Equip.Arme = "Hache rouillée"
@@ -195,14 +183,16 @@ func displayInfo(c *projet.Character) {
 	fmt.Printf("Mana      : %d / %d\n", c.Mana, c.MaxMana)
 	fmt.Printf("Initiative: %d\n", c.Initiative)
 	fmt.Printf("XP        : %d / %d\n", c.Exp, c.ExpMax)
-	fmt.Printf("Équipé    : Arme[%s] Tête[%s] Torse[%s] Gant[%s] Centure[%s] Pieds[%s] Talisman[%s]\n",
+	fmt.Printf(
+		"Équipé    : Arme[%s] Tête[%s] Torse[%s] Gants[%s] Ceinture[%s] Pieds[%s] Talisman[%s]\n",
 		func() string {
 			if c.Equip.Arme == "" {
 				return "Coup de poing"
 			}
 			return c.Equip.Arme
 		}(),
-		c.Equip.Tête, c.Equip.Torse, c.Equip.Pieds, c.Equip.Gants, c.Equip.Ceinture, c.Equip.Talisman)
+		c.Equip.Tête, c.Equip.Torse, c.Equip.Gants, c.Equip.Ceinture, c.Equip.Pieds, c.Equip.Talisman,
+	)
 	fmt.Println("Or        :", c.Gold)
 	if len(c.Inventory) == 0 {
 		fmt.Println("Inventaire: vide")
@@ -242,7 +232,6 @@ func AccessInventory(c *projet.Character) {
 		spellBook(c)
 	case "Potion de mana":
 		manaPot(c)
-
 	default:
 		if _, ok := projet.ArmeDB[item]; ok && item != "Coup de poing" {
 			equipWeapon(c, item)
@@ -527,15 +516,21 @@ func Forgeron(c *projet.Character) {
 
 func recomputeMaxHP(c *projet.Character) {
 	base := c.BaseMaxHP
-	if a, ok := projet.ArmureDB[c.Equip.Tête]; ok {
-		base += a.HPBonus
+	slots := []string{
+		c.Equip.Tête,
+		c.Equip.Torse,
+		c.Equip.Pieds,
+		c.Equip.Ceinture,
+		c.Equip.Talisman,
+		c.Equip.Gants,
 	}
-	if a, ok := projet.ArmureDB[c.Equip.Torse]; ok {
-		base += a.HPBonus
+
+	for _, s := range slots {
+		if a, ok := projet.ArmureDB[s]; ok {
+			base += a.HPBonus
+		}
 	}
-	if a, ok := projet.ArmureDB[c.Equip.Pieds]; ok {
-		base += a.HPBonus
-	}
+
 	c.MaxHP = base
 	if c.HP > c.MaxHP {
 		c.HP = c.MaxHP
@@ -568,11 +563,9 @@ func Equipement(c *projet.Character) {
 			fmt.Println("Aucun chapeau trouvé dans l'inventaire.")
 			return
 		}
-
 		if c.Equip.Tête != "" {
 			c.Inventory = append(c.Inventory, c.Equip.Tête)
 		}
-
 		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
 		c.Equip.Tête = "Chapeau de l'aventurier"
 		recomputeMaxHP(c)
@@ -615,7 +608,7 @@ type Monster struct {
 	MaxHP       int
 	HP          int
 	ATK         int
-	Initiative  int // ← utilisé pour comparer
+	Initiative  int
 	XPReward    int
 	PoisonTurns int
 }
@@ -642,7 +635,6 @@ func goblinPattern(g *Monster, c *projet.Character, turn int) {
 }
 
 func characterTurn(c *projet.Character, g *Monster) (ended bool) {
-
 	for {
 		var choix int
 		fmt.Println("===== Votre tour =====")
@@ -659,7 +651,6 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 			if c.Equip.Arme != "" {
 				weapons = append(weapons, c.Equip.Arme)
 			}
-
 			fmt.Println("— Choisir l’arme —")
 			for i, w := range weapons {
 				min, max := weaponDamageRange(w)
@@ -692,7 +683,7 @@ func characterTurn(c *projet.Character, g *Monster) (ended bool) {
 			return false
 
 		case 2:
-			AccessInventoryFight(c, g) // ← au lieu de AccessInventory(c)
+			AccessInventoryFight(c, g)
 			return FalseIfBothAlive(c, g)
 		case 3:
 			fmt.Println("Vous fuyez le combat.")
@@ -804,7 +795,7 @@ func goblinFight(c *projet.Character) {
 			}
 			if g.HP <= 0 {
 				fmt.Printf("%s est vaincu !\n", g.Name)
-				rewardVictory(c, g) // ← ICI aussi
+				rewardVictory(c, g)
 				fmt.Println("Fin du combat.")
 				return
 			}
@@ -839,7 +830,6 @@ func weaponDamageRange(weaponName string) (min, max int) {
 	if ws, ok := projet.ArmeDB[weaponName]; ok {
 		return ws.Min, ws.Max
 	}
-	// fallback
 	return projet.ArmeDB["Coup de poing"].Min, projet.ArmeDB["Coup de poing"].Max
 }
 
@@ -869,24 +859,38 @@ func equipArmor(c *projet.Character, name string) {
 		fmt.Println("Ce n’est pas une armure connue.")
 		return
 	}
-	removeItem(c, name)
-	switch a.Slot {
-	case "Head":
+
+	switch a.Slot { // slots conformes à ArmureDB
+	case "Tête":
 		if c.Equip.Tête != "" {
 			c.Inventory = append(c.Inventory, c.Equip.Tête)
 		}
 		c.Equip.Tête = name
-	case "Chestplate":
+	case "Torse":
 		if c.Equip.Torse != "" {
 			c.Inventory = append(c.Inventory, c.Equip.Torse)
 		}
 		c.Equip.Torse = name
-	case "Feet":
+	case "Pieds":
 		if c.Equip.Pieds != "" {
 			c.Inventory = append(c.Inventory, c.Equip.Pieds)
 		}
 		c.Equip.Pieds = name
+	case "Talisman":
+		if c.Equip.Talisman != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Talisman)
+		}
+		c.Equip.Talisman = name
+	case "Ceinture":
+		if c.Equip.Ceinture != "" {
+			c.Inventory = append(c.Inventory, c.Equip.Ceinture)
+		}
+		c.Equip.Ceinture = name
+	default:
+		fmt.Printf("Slot d’armure inconnu: %q\n", a.Slot)
+		return
 	}
+	removeItem(c, name)
 
 	recomputeMaxHP(c)
 	fmt.Printf("🛡️ Armure équipée : %s (+%d PV max)\n", name, a.HPBonus)
@@ -971,7 +975,7 @@ func castSpell(c *projet.Character, g *Monster) (ended bool) {
 	if c.Mana < cost {
 		fmt.Printf("❌ Mana insuffisant (%d/%d). Ce sort nécessite %d mana.\n", c.Mana, c.MaxMana, cost)
 		return false
-	} 
+	}
 	c.Mana -= cost
 	g.HP -= dmg
 	if g.HP < 0 {
@@ -1026,7 +1030,7 @@ func AccessInventoryFight(c *projet.Character, g *Monster) {
 	case "Livre de Sort : Boule de Feu":
 		spellBook(c)
 	case "Potion de poison":
-		poisonPotEnemy(c, g) // ← empoisonne le MONSTRE
+		poisonPotEnemy(c, g)
 	default:
 		if _, ok := projet.ArmeDB[item]; ok && item != "Coup de poing" {
 			equipWeapon(c, item)
