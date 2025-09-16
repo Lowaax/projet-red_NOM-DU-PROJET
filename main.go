@@ -20,7 +20,7 @@ func main() {
 	//accessInventory(c1)
 }
 
-func initCharacter(name, race, class string, maxHP int) *projet.Character {
+func initCharacter(name, race, class string, maxHP int, mana int) *projet.Character {
 	return &projet.Character{
 		Name:              name,
 		Race:              race,
@@ -34,8 +34,8 @@ func initCharacter(name, race, class string, maxHP int) *projet.Character {
 		Gold:              100,
 		MaxInventory:      10,
 		InventoryUpgrades: 0,
-		MaxMana:           10,
-		Mana:              10,
+		MaxMana:           200,
+		Mana:              mana,
 		Initiative:        5,
 		Exp:               0,
 		ExpMax:            10,
@@ -66,38 +66,38 @@ func characterCreation() *projet.Character {
 
 	var raceChoice int
 	fmt.Scan(&raceChoice)
-
+	mana := 20
 	race := "Human"
 	maxHP := 100
 	switch raceChoice {
 	case 1: // Human
-		race, maxHP = "Human", 100
+		race, maxHP, mana = "Human", 100, 100
 	case 2: // Elf
-		race, maxHP = "Elf", 80
+		race, maxHP, mana = "Elf", 80, 140
 	case 3: // Nain
-		race, maxHP = "Nain", 120
+		race, maxHP, mana = "Nain", 120, 60
 	case 4: // Orc
-		race, maxHP = "Orc", 110
+		race, maxHP, mana = "Orc", 130, 30
 	case 5: // Dragon
-		race, maxHP = "Dragon", 140
+		race, maxHP, mana = "Dragon", 140, 120
 	case 6: // Mort-vivant
-		race, maxHP = "Mort-vivant", 90
+		race, maxHP, mana = "Mort-vivant", 90, 90
 	case 7: // Ange
-		race, maxHP = "Ange", 100
+		race, maxHP, mana = "Ange", 110, 110
 	case 8: // Orque (syno d’orc séparé dans ta liste)
-		race, maxHP = "Orque", 110
+		race, maxHP, mana = "Orque", 120, 30
 	case 9: // Centaure
-		race, maxHP = "Centaure", 110
+		race, maxHP, mana = "Centaure", 110, 40
 	case 10: // Fée
-		race, maxHP = "Fée", 70
+		race, maxHP, mana = "Fée", 70, 140
 	case 11: // Vampire
-		race, maxHP = "Vampire", 100
+		race, maxHP, mana = "Vampire", 100, 120
 	case 12: // Farfadet
-		race, maxHP = "Farfadet", 75
+		race, maxHP, mana = "Farfadet", 75, 130
 	case 13: // Antromorphe
-		race, maxHP = "Antromorphe", 100
+		race, maxHP, mana = "Antromorphe", 100, 110
 	default:
-		fmt.Println("Entrée invalide → race par défaut : Human (100 PV).")
+		fmt.Println("Entrée invalide → race par défaut : Human (100 PV et 100 Mana).")
 	}
 
 	fmt.Println("Choisissez une CLASSE :")
@@ -134,7 +134,7 @@ func characterCreation() *projet.Character {
 	}
 
 	// Création du perso avec PV selon la race (HP init = 50% dans initCharacter)
-	c := initCharacter(name, race, class, maxHP)
+	c := initCharacter(name, race, class, maxHP, mana)
 
 	switch class {
 	case "Chevalier":
