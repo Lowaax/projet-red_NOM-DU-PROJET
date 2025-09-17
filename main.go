@@ -278,6 +278,7 @@ func spellBook(c *projet.Character) {
 		}
 	}
 	c.Skills = append(c.Skills, "Boule de Feu")
+	removeItem(c, "Livre de Sort : Boule de Feu")
 	fmt.Println("🔥 Nouveau sort appris : Boule de Feu !")
 }
 
