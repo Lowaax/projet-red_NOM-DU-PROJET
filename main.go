@@ -228,7 +228,7 @@ func AccessInventory(c *projet.Character) {
 		takePot(c)
 	case "Potion de poison":
 		fmt.Println("Cette potion est utilisable uniquement en combat pour empoisonner un ennemi.")
-	case "Livre de Sort : Boule de Feu":
+	case "Livre de Sort : Boule de Feu", "Grimoire de feu", "Spellbook: Fireball":
 		spellBook(c)
 	case "Potion de mana":
 		manaPot(c)
@@ -271,15 +271,13 @@ func manaPot(c *projet.Character) {
 }
 
 func spellBook(c *projet.Character) {
-	for _, s := range c.Skills {
-		if s == "Boule de Feu" {
-			fmt.Println("✨ Sort déjà appris.")
-			return
-		}
-	}
-	c.Skills = append(c.Skills, "Boule de Feu")
+	learned := addSkill(c, "Boule de Feu")
 	removeItem(c, "Livre de Sort : Boule de Feu")
-	fmt.Println("🔥 Nouveau sort appris : Boule de Feu !")
+	if learned {
+		fmt.Println("🔥 Nouveau sort appris : Boule de Feu !")
+	} else {
+		fmt.Println("✨ Sort déjà appris.")
+	}
 }
 
 func addItem(c *projet.Character, item string) bool {
@@ -933,23 +931,10 @@ func levelUp(c *projet.Character) {
 }
 
 func castSpell(c *projet.Character, g *Monster) (ended bool) {
-	if len(c.Skills) == 0 {
-		fmt.Println("Vous ne connaissez aucun sort.")
-		return false
-	}
-
-	spellCost := map[string]int{
-		"Coup de poing": 3,
-		"Boule de Feu":  7,
-	}
-	spellDamage := map[string]int{
-		"Coup de poing": 8,
-		"Boule de Feu":  18,
-	}
-
+	// construit la liste des sorts connus *offensifs* en se basant sur Spells
 	known := []string{}
 	for _, s := range c.Skills {
-		if _, ok := spellDamage[s]; ok {
+		if _, ok := projet.Spells[s]; ok {
 			known = append(known, s)
 		}
 	}
@@ -960,7 +945,8 @@ func castSpell(c *projet.Character, g *Monster) (ended bool) {
 
 	fmt.Println("— Choisir un sort —")
 	for i, s := range known {
-		fmt.Printf("%d) %s (coût %d mana, %d dégâts)\n", i+1, s, spellCost[s], spellDamage[s])
+		sp := projet.Spells[s]
+		fmt.Printf("%d) %s (coût %d mana, %d dégâts)\n", i+1, s, sp.Cost, sp.Damage)
 	}
 	fmt.Print("Sort : ")
 	var sch int
@@ -970,19 +956,18 @@ func castSpell(c *projet.Character, g *Monster) (ended bool) {
 		return false
 	}
 	name := known[sch-1]
-	cost := spellCost[name]
-	dmg := spellDamage[name]
+	sp := projet.Spells[name]
 
-	if c.Mana < cost {
-		fmt.Printf("❌ Mana insuffisant (%d/%d). Ce sort nécessite %d mana.\n", c.Mana, c.MaxMana, cost)
+	if c.Mana < sp.Cost {
+		fmt.Printf("❌ Mana insuffisant (%d/%d). %s nécessite %d mana.\n", c.Mana, c.MaxMana, name, sp.Cost)
 		return false
 	}
-	c.Mana -= cost
-	g.HP -= dmg
+	c.Mana -= sp.Cost
+	g.HP -= sp.Damage
 	if g.HP < 0 {
 		g.HP = 0
 	}
-	fmt.Printf("%s lance %s et inflige %d dégâts à %s. (Mana %d/%d)\n", c.Name, name, dmg, g.Name, c.Mana, c.MaxMana)
+	fmt.Printf("%s lance %s et inflige %d dégâts à %s. (Mana %d/%d)\n", c.Name, name, sp.Damage, g.Name, c.Mana, c.MaxMana)
 	fmt.Printf("PV de %s : %d / %d\n", g.Name, g.HP, g.MaxHP)
 	return false
 }
@@ -1028,7 +1013,7 @@ func AccessInventoryFight(c *projet.Character, g *Monster) {
 		takePot(c)
 	case "Potion de mana":
 		manaPot(c)
-	case "Livre de Sort : Boule de Feu":
+	case "Livre de Sort : Boule de Feu", "Grimoire de feu", "Spellbook: Fireball":
 		spellBook(c)
 	case "Potion de poison":
 		poisonPotEnemy(c, g)
@@ -1073,4 +1058,26 @@ func VoleDeVieCharVsMonstre(attacker *projet.Character, cible *Monster, dmg int,
 
 func VoleDeVie(attacker *projet.Character, cible *Monster, dmg int, ratio float64) (int, int) {
 	return VoleDeVieCharVsMonstre(attacker, cible, dmg, ratio)
+}
+
+func addSkill(c *projet.Character, name string) bool {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return false
+	}
+	for _, s := range c.Skills {
+		if strings.EqualFold(s, name) {
+			return false
+		}
+	}
+	if _, ok := projet.Spells[name]; ok {
+		c.Skills = append(c.Skills, name)
+		return true
+	}
+	if strings.EqualFold(name, "boule de feu") || strings.EqualFold(name, "grimoire de feu") {
+		c.Skills = append(c.Skills, "Boule de Feu")
+		return true
+	}
+	c.Skills = append(c.Skills, name)
+	return true
 }

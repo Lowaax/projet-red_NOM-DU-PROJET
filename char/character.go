@@ -109,3 +109,10 @@ var ArmureDB = map[string]struct {
 	"Bandeau":                 {Slot: "Tête", HPBonus: 8},
 	"Ceinture de cuir":        {Slot: "Ceinture", HPBonus: 5},
 }
+
+type Spell struct{ Cost, Damage int }
+
+var Spells = map[string]Spell{
+	"Coup de poing": {Cost: 3, Damage: 8},
+	"Boule de Feu":  {Cost: 7, Damage: 18},
+}
