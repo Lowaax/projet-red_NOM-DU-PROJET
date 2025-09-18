@@ -22,15 +22,16 @@ func initCharacter(name, race, class string, maxHP int, mana int) *projet.Charac
 		Class:             class,
 		Level:             1,
 		BaseMaxHP:         maxHP,
+		BaseMaxMana:       mana,
 		MaxHP:             maxHP,
 		HP:                maxHP / 2,
+		MaxMana:           mana,
+		Mana:              mana,
 		Inventory:         []string{"Potion", "Potion", "Potion"},
 		Skills:            []string{"Coup de poing"},
 		Gold:              100,
 		MaxInventory:      10,
 		InventoryUpgrades: 0,
-		MaxMana:           200,
-		Mana:              mana,
 		Initiative:        5,
 		Exp:               0,
 		ExpMax:            10,
@@ -169,7 +170,7 @@ func characterCreation() *projet.Character {
 		addItem(c, "Dague vampirique")
 	}
 
-	recomputeMaxHP(c)
+	recomputeStats(c)
 	return c
 }
 
@@ -513,8 +514,11 @@ func Forgeron(c *projet.Character) {
 	CraftItem(item)
 }
 
-func recomputeMaxHP(c *projet.Character) {
-	base := c.BaseMaxHP
+func recomputeStats(c *projet.Character) {
+	baseHP := c.BaseMaxHP
+	baseMana := c.BaseMaxMana
+	manaBonus := 0
+
 	slots := []string{
 		c.Equip.Tête,
 		c.Equip.Torse,
@@ -526,13 +530,19 @@ func recomputeMaxHP(c *projet.Character) {
 
 	for _, s := range slots {
 		if a, ok := projet.ArmureDB[s]; ok {
-			base += a.HPBonus
+			baseHP += a.HPBonus
+			manaBonus += a.ManaBonus
 		}
 	}
 
-	c.MaxHP = base
+	c.MaxHP = baseHP
+	c.MaxMana = baseMana + manaBonus
+
 	if c.HP > c.MaxHP {
 		c.HP = c.MaxHP
+	}
+	if c.Mana > c.MaxMana {
+		c.Mana = c.MaxMana
 	}
 }
 
@@ -567,7 +577,7 @@ func Equipement(c *projet.Character) {
 		}
 		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
 		c.Equip.Tête = "Chapeau de l'aventurier"
-		recomputeMaxHP(c)
+		recomputeStats(c)
 		fmt.Println("Chapeau équipé.")
 	case 2:
 		idx, ok := pickFromInv("Tunique de l'aventurier")
@@ -580,7 +590,7 @@ func Equipement(c *projet.Character) {
 		}
 		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
 		c.Equip.Torse = "Tunique de l'aventurier"
-		recomputeMaxHP(c)
+		recomputeStats(c)
 		fmt.Println("Tunique équipée.")
 	case 3:
 		idx, ok := pickFromInv("Bottes de l'aventurier")
@@ -593,7 +603,7 @@ func Equipement(c *projet.Character) {
 		}
 		c.Inventory = append(c.Inventory[:idx], c.Inventory[idx+1:]...)
 		c.Equip.Pieds = "Bottes de l'aventurier"
-		recomputeMaxHP(c)
+		recomputeStats(c)
 		fmt.Println("Bottes équipées.")
 	case 0:
 		return
@@ -859,7 +869,7 @@ func equipArmor(c *projet.Character, name string) {
 		return
 	}
 
-	switch a.Slot { // slots conformes à ArmureDB
+	switch a.Slot {
 	case "Tête":
 		if c.Equip.Tête != "" {
 			c.Inventory = append(c.Inventory, c.Equip.Tête)
@@ -891,8 +901,8 @@ func equipArmor(c *projet.Character, name string) {
 	}
 	removeItem(c, name)
 
-	recomputeMaxHP(c)
-	fmt.Printf("🛡️ Armure équipée : %s (+%d PV max,+%d PV max)\n", name, a.HPBonus, a.ManaBonus)
+	recomputeStats(c)
+	fmt.Printf("🛡️ Armure équipée : %s (+%d PV max, +%d Mana max)\n", name, a.HPBonus, a.ManaBonus)
 }
 
 func playerStarts(c *projet.Character, g *Monster) bool {
@@ -900,7 +910,7 @@ func playerStarts(c *projet.Character, g *Monster) bool {
 		return true
 	}
 	if c.Initiative < g.Initiative {
-		return false	
+		return false
 	}
 	return rand.Intn(2) == 0
 }
@@ -921,17 +931,16 @@ func rewardVictory(c *projet.Character, g *Monster) {
 func levelUp(c *projet.Character) {
 	c.Level++
 	c.BaseMaxHP += 5
-	recomputeMaxHP(c)
-	c.MaxMana += 2
+	c.BaseMaxMana += 2
 	c.Initiative += 1
 	c.ExpMax += 10
+	recomputeStats(c)
 	c.HP = c.MaxHP
 	c.Mana = c.MaxMana
 	fmt.Printf("⬆️  Niveau %d ! (+5 PV max, +2 Mana max, +1 Initiative)\n", c.Level)
 }
 
 func castSpell(c *projet.Character, g *Monster) (ended bool) {
-	// construit la liste des sorts connus *offensifs* en se basant sur Spells
 	known := []string{}
 	for _, s := range c.Skills {
 		if _, ok := projet.Spells[s]; ok {

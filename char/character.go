@@ -32,6 +32,7 @@ type Character struct {
 	Class             string
 	Level             int
 	BaseMaxHP         int
+	BaseMaxMana       int
 	MaxHP             int
 	HP                int
 	MaxMana           int
