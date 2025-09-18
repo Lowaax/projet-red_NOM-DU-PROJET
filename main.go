@@ -892,7 +892,7 @@ func equipArmor(c *projet.Character, name string) {
 	removeItem(c, name)
 
 	recomputeMaxHP(c)
-	fmt.Printf("🛡️ Armure équipée : %s (+%d PV max)\n", name, a.HPBonus)
+	fmt.Printf("🛡️ Armure équipée : %s (+%d PV max,+%d PV max)\n", name, a.HPBonus, a.ManaBonus)
 }
 
 func playerStarts(c *projet.Character, g *Monster) bool {
@@ -900,7 +900,7 @@ func playerStarts(c *projet.Character, g *Monster) bool {
 		return true
 	}
 	if c.Initiative < g.Initiative {
-		return false
+		return false	
 	}
 	return rand.Intn(2) == 0
 }
